@@ -1,0 +1,1 @@
+constexpr float TAKEOFF_ACCEL_THRESHOLD = 0.0f;
