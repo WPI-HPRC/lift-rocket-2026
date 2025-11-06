@@ -1,5 +1,6 @@
 #pragma once
+#include <SdFat.h>
 
 struct Context {
-    int contextData;
+    SdFs sd;
 };
