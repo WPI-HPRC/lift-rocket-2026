@@ -1,3 +1,4 @@
+/*
 #include <Arduino.h>
 
 #include "Context.h"
@@ -200,7 +201,6 @@ void mainLoop() {
     cam_spi.transfer(buff, 1);
     Serial.printf("%d\n", *buff);
     digitalWrite(CAM_CS, HIGH);
-*/
 
     static uint32_t lastBaroDataLogged = 0;
     static uint32_t lastAccelDataLogged = 0;
@@ -309,3 +309,4 @@ void loggingLoop() {
 void occasionalLoop() { ctx.logFile.flush(); ctx.errorLogFile.flush(); }
 
 void loop() { handleSDInterface(&ctx); IWatchdog.reload(); }
+*/
