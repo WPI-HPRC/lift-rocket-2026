@@ -3,15 +3,6 @@
 #include "State.hpp"
 #include "States.hpp"
 
-#include "states/Abort.cpp"
-#include "states/Boost.cpp"
-#include "states/Coast.cpp"
-#include "states/DrogueDescent.cpp"
-#include "states/MainDescent.cpp"
-#include "states/PreLaunch.cpp"
-#include "states/Recovery.cpp"
-
-
 Context ctx = {
     .sd = SdFs()
 };
