@@ -58,3 +58,5 @@
 #endif
 
 #define GROUNDSTATION_XBEE_ADDRESS 0x0013A200423F474C
+
+constexpr static float g = 9.80665; // [m/s/s] Earth's Grav Accel

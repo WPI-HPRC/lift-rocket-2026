@@ -1,8 +1,8 @@
 #pragma once
 
 #include <stdint.h>
-#include "ASM330.h"
-#include "LSP22.h"
+#include "Sensors/ASM330.h"
+#include "Sensors/LSP22.h"
 
 enum SensorType {
     ASM330_TAG = 0,
