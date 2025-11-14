@@ -1,4 +1,4 @@
-#include "../State.hpp"
+#include "../State.h"
 
 void coastInit (StateData* data) {
     // initialize altitude
