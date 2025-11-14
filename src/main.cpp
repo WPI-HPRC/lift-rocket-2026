@@ -142,6 +142,10 @@ void sensorLoop() {
 
         if(icm_desc.timestamp > 0)
         {
+            SensorData d = {
+                .icm20948 = icm_desc.data
+            };
+            writePacket(&ctx, d, ICM20948_TAG);
             Serial.print("ICM20948 - Accel: ");
             Serial.print(icm_desc.data.accelX, 4);
             Serial.print(", ");
@@ -164,6 +168,10 @@ void sensorLoop() {
 
         if(gps_desc.timestamp > 0)
         {
+            SensorData d = {
+                .max10s = gps_desc.data
+            };
+            writePacket(&ctx, d, MAX10S_TAG);
             Serial.print("MAX10S - Lat, Lon, AltMSL, AltElipsoid: ");
             Serial.print(gps_desc.data.lat, 4);
             Serial.print(", ");

@@ -5,8 +5,10 @@
 #include "config.h"
 
 size_t dataLengths[] = {
-    6 * sizeof(float), // Length of s1 data in Bytes
-    2 * sizeof(double) // Length of s2 data in Bytes
+    sizeof(ASM330Data),
+    sizeof(LPS22Data), // Length of s2 data in Bytes
+    sizeof(ICMData),
+    sizeof(MAX10SData)
 };
 
 void initializeLogging(Context *ctx) {

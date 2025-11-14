@@ -6,16 +6,16 @@
 #include <SparkFun_u-blox_GNSS_v3.h>
 
 struct MAX10SData {
-    float lat = 0;
-    float lon = 0;
-    float altMSL = 0.0;
-    float altEllipsoid = 0.0;
-    int32_t velN = 0;
-    int32_t velE = 0;
-    int32_t velD = 0;
-    uint32_t epochTime = 0;
-    uint8_t satellites = 0;
-    uint8_t gpsLockType = 0;
+    float lat;
+    float lon;
+    float altMSL;
+    float altEllipsoid;
+    int32_t velN;
+    int32_t velE;
+    int32_t velD;
+    uint32_t epochTime;
+    uint8_t satellites;
+    uint8_t gpsLockType;
 };
 
 class MAX10S: public SensorBase<MAX10S, MAX10SData>, public ISensor {

@@ -5,8 +5,7 @@
 #include <Adafruit_ICM20948.h>
 #include "config.h"
 
-struct ICMData
-{
+struct ICMData {
     float accelX, accelY, accelZ;
     float gyrX, gyrY, gyrZ;
     float magX, magY, magZ;
