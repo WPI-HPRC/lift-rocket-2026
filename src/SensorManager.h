@@ -7,11 +7,13 @@ enum class SensorDataType : uint8_t {
   ACCEL = 0,
   BARO = 1,
   GPS = 2,
+  CURR = 3,
 };
 
 // Forward declarations
 class ASM330;
 class LPS22;
+// ???? this might not be needed anymore
 
 // Sensor data descriptor
 template <typename T> 

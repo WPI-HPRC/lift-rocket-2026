@@ -8,6 +8,7 @@
 #include "Sensors/ASM330.h"
 #include "Sensors/ICM20948.h"
 #include "Sensors/MAX10S.h"
+#include "Sensors/INA219.h"
 #include "config.h"
 
 #include "logging.h"
@@ -22,6 +23,7 @@ ASM330 asm330;
 LPS22 lps22;
 ICM20948 icm20948;
 MAX10S max10s;
+INA219 ina219;
 
 // Create Sensor manager 
 SensorManager manager;
@@ -55,6 +57,7 @@ void sensorsSetup() {
     manager.add_sensor(&lps22);
     manager.add_sensor(&icm20948);
     manager.add_sensor(&max10s);
+    manager.add_sensor(&ina219);
 
     // Initialize all sensors
     manager.init_all();
@@ -75,8 +78,7 @@ void sensorLoop() {
     manager.update_all();
 
     // manager is not being used here to get data
-    if (millis() - last_print > 1000)
-    {
+    if (millis() - last_print > 1000) {
         last_print = millis();
         loop_count++;
 
@@ -89,12 +91,12 @@ void sensorLoop() {
         const auto &baro_desc = lps22.descriptor();
         const auto &icm_desc = icm20948.descriptor();
         const auto &gps_desc = max10s.descriptor();
+        const auto &ina_desc = ina219.descriptor();
 
         bool has_data = false;
 
         // Print ASM330 data
-        if (accel_desc.timestamp > 0)
-        {
+        if (accel_desc.timestamp > 0) {
             SensorData d = {
                 .asm330 = accel_desc.data
             };
@@ -115,14 +117,12 @@ void sensorLoop() {
             Serial.println();
             has_data = true;
         }
-        else
-        {
+        else {
             Serial.println("ASM330: No data (timestamp = 0)");
         }
 
         // Print LPS22 data
-        if (baro_desc.timestamp > 0)
-        {
+        if (baro_desc.timestamp > 0) {
             SensorData d = {
                 .lps22 = baro_desc.data
             };
@@ -135,13 +135,11 @@ void sensorLoop() {
             Serial.println(" C");
             has_data = true;
         }
-        else
-        {
+        else {
             Serial.println("LPS22: No data (timestamp = 0)");
         }
 
-        if(icm_desc.timestamp > 0)
-        {
+        if(icm_desc.timestamp > 0) {
             Serial.print("ICM20948 - Accel: ");
             Serial.print(icm_desc.data.accelX, 4);
             Serial.print(", ");
@@ -157,13 +155,11 @@ void sensorLoop() {
             Serial.println();
             has_data = true;
         }
-        else
-        {
+        else {
             Serial.println("ICM20948: No data (timestamp = 0)");
         }
 
-        if(gps_desc.timestamp > 0)
-        {
+        if(gps_desc.timestamp > 0) {
             Serial.print("MAX10S - Lat, Lon, AltMSL, AltElipsoid: ");
             Serial.print(gps_desc.data.lat, 4);
             Serial.print(", ");
@@ -175,13 +171,19 @@ void sensorLoop() {
             Serial.println();
             has_data = true;
         }
-        else
-        {
+        else {
             Serial.println("MAX10S: No data (timestamp = 0)");
         }
 
-        if (!has_data)
-        {
+        if(ina_desc.timestamp > 0) {
+            Serial.print("INA219 - Curr: ");
+            Serial.println(ina_desc.data.curr, 4);
+            has_data = true;
+        } else {
+            Serial.println("INA219: No data (timestamp = 0)");
+        }
+
+        if (!has_data) {
             Serial.println("No sensor data received yet...");
         }
 
