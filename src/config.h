@@ -28,10 +28,16 @@
 
     #define RELAY_PIN PE5
 
-    #define SERVO_MIN 1500
-    #define SERVO_MAX 1775
+    #define SERVO_PIN PC11
+    #define SERVO_MIN 1600
+    #define SERVO_MAX 1955
 
-    #define LED_PIN PB9
+
+    #define RED_LED_PIN1 PE0
+    #define RED_LED_PIN2 PE1
+    #define BLUE_LED_PIN PG15
+    #define RED_LED_PIN PB8
+    #define GREEN_LED_PIN PB9
 #elif defined(POLARIS)
     #include "boilerplate/Sensors/Impl/MAX10S.h"
     #include "boilerplate/Sensors/Impl/Polaris/ICM42688.h"

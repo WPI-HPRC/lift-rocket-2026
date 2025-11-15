@@ -1,10 +1,41 @@
 #include "../State.h"
 
+double solveAltitude(double pressure) {
+    // physical parameters for model
+    const double pb = 101325;  // [Pa] pressure at sea level
+    const double Tb = 288.15;  // [K] temperature at seal level
+    const double Lb = -0.0065; // [K/m] standard temperature lapse rate
+    const double hb =
+        0;                      // [m] height at bottom of atmospheric layer (sea level)
+    const double R = 8.31432;   // [N*m/mol*K] universal gas constant
+    const double g0 = 9.80665;  // [m/s^2] Earth standard gravity
+    const double M = 0.0289644; // [kg/mol] molar mass of Earth's air
+
+    double pressure_Pa = pressure * 100;
+
+    return hb +
+           (Tb / Lb) * (pow((pressure_Pa / pb), (-R * Lb / (g0 * M))) - 1);
+}
 void coastInit (StateData* data) {
     // initialize altitude
+    data->startTime = millis();
+    data->currentTime = 0;
+    data->deltaTime = 0;
+    data->lastLoopTime = 0;
+    data->loopCount = 0;
 }
 
 StateID coastLoop (StateData* data, Context* ctx) {
+    static bool airBrakesOut = false;
+    static bool airBrakesDone = false;
+    static bool prevAltitude = 0;
+    long long now = millis();
+    // These values may be used in the state code
+    data->currentTime = now - data->startTime;
+    data->deltaTime = now - data->lastLoopTime;
+    data->lastLoopTime = now;
+    data->loopCount++;
+
     /*
     - Poll acceleration data from ctx
     - Check acceleration to detect drouge deployment
@@ -13,5 +44,24 @@ StateID coastLoop (StateData* data, Context* ctx) {
     - Update sensor data and ctx for next iteration?
     */
 
-    return DROGUE_DESCENT;
+    if(data->currentTime > 1000 && !airBrakesOut) {
+        ctx->airBrakes.writeMicroseconds(SERVO_MAX);
+        airBrakesOut = true;
+    }
+    if(data->currentTime > 5000 && airBrakesOut) {
+        ctx->airBrakes.writeMicroseconds(SERVO_MIN);
+        airBrakesDone = true;
+    }
+
+    const auto &baro_desc = ctx->baro.descriptor();
+    if (baro_desc.timestamp != data->lastBaroReadingTime) {
+        data->lastBaroReadingTime = baro_desc.timestamp;
+        double currentAltitiude = solveAltitude(baro_desc.data.pressure);
+        if(data->accelDebouncer.update((currentAltitiude - prevAltitude) < 0 ,millis()) && airBrakesDone) {
+            return DROGUE_DESCENT;
+        }
+        prevAltitude = currentAltitiude;
+    }
+
+    return COAST;
 }

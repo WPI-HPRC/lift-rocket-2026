@@ -5,12 +5,14 @@
 #include "Sensors/LSP22.h"
 #include "Sensors/ICM20948.h"
 #include "Sensors/MAX10S.h"
+#include "Sensors/INA219.h"
 
 enum SensorType {
     ASM330_TAG = 0,
     LPS22_TAG = 1,
     ICM20948_TAG = 2,
-    MAX10S_TAG= 3,
+    MAX10S_TAG = 3,
+    INA219_TAG = 4
 };
 
 union SensorData {
@@ -18,6 +20,7 @@ union SensorData {
     LPS22Data lps22;
     ICMData icm20948;
     MAX10SData max10s;
+    INA219Data ina219;
 };
 
 
@@ -28,6 +31,6 @@ struct Packet {
     SensorData data;
 };
 
-void initializeLogging(Context *ctx);
+bool initializeLogging(Context *ctx);
 
 void writePacket(Context *ctx, SensorData data, SensorType type);

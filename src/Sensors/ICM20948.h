@@ -71,17 +71,17 @@ public:
         float mY = mag.magnetic.y;
         float mZ = mag.magnetic.z;
 
-        desc.data.accelX = aX;
-        desc.data.accelY = aZ;
-        desc.data.accelZ = -aY;
+        desc.data.accelX = aZ;
+        desc.data.accelY = -aY;
+        desc.data.accelZ = aX;
 
-        desc.data.gyrX = gX;
-        desc.data.gyrY = gZ;
-        desc.data.gyrZ = -gY;
+        desc.data.gyrX = gZ;
+        desc.data.gyrY = -gY;
+        desc.data.gyrZ = gX;
 
-        desc.data.magX = mX;
-        desc.data.magY = mZ;
-        desc.data.magZ = -mY;
+        desc.data.magX = mZ;
+        desc.data.magY = mY;
+        desc.data.magZ = -mX;
 
         desc.data.temp = temp.temperature;
         desc.timestamp = now;

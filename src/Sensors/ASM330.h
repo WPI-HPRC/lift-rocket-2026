@@ -58,12 +58,12 @@ public:
     AccGyr.Get_X_Axes(accel);
     AccGyr.Get_G_Axes(gyro);
 
-    desc.data.accelX = -(float)accel[1] / 1000.0f;
-    desc.data.accelY = (float)accel[0] / 1000.0f;
-    desc.data.accelZ = (float)accel[2] / 1000.0f;
-    desc.data.gyrX = -(float)gyro[1] / 1000.0f;
-    desc.data.gyrY = (float)gyro[0] / 1000.0f;
-    desc.data.gyrZ = (float)gyro[2] / 1000.0f;
+    desc.data.accelX = (float)accel[2] / 1000.0f; // 0
+    desc.data.accelY = -(float)accel[0] / 1000.0f;  // 1
+    desc.data.accelZ = -(float)accel[1] / 1000.0f;  // 2
+    desc.data.gyrX = (float)gyro[2] / 1000.0f;
+    desc.data.gyrY = -(float)gyro[0] / 1000.0f;
+    desc.data.gyrZ = -(float)gyro[1] / 1000.0f;
     desc.timestamp = now;
   }
 

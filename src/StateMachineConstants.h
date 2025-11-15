@@ -1,6 +1,8 @@
 #pragma once
 
-constexpr float TAKEOFF_ACCEL_THRESHOLD = 0.0f;
+constexpr float LAUNCH_TRHESHOLD = 2;
+
+constexpr float COAST_THRESHOLD = 0.3f;
 
 constexpr float BOOST_TIMEOUT = 0.0f;
 

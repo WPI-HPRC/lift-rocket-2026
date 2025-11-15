@@ -1,14 +1,65 @@
 #include "../State.h"
+#include "logging.h"
+#include "StateMachineConstants.h"
+#include "Arduino.h"
+#include "config.h"
 
-void prelaunchInit (StateData* data) {}
+void prelaunchInit (StateData* data) {
+    data->startTime = millis();
+    data->currentTime = 0;
+    data->deltaTime = 0;
+    data->lastLoopTime = 0;
+    data->loopCount = 0;
+}
 
-StateID prelaunchLoop (StateData* data, Context* ctx) {
+StateID prelaunchLoop(StateData *data, Context *ctx) {
+    //Serial.println("looping prelaunch");
+
+    static bool BlueLedState = false;
+    static bool GreenLedState = false;
+    static uint32_t lastBlueToggleTime = 0;
+    static uint32_t lastGreenToggleTime = 0;
+
+    long long now = millis();
+    // These values may be used in the state code
+    data->currentTime = now - data->startTime;
+    data->deltaTime = now - data->lastLoopTime;
+    data->lastLoopTime = now;
+    data->loopCount++;
+
     /*
     - Poll acceleration data from ctx
     - Check acceleration to detect launch
     - Check if need to abort
     - Update sensor data and ctx for next iteration?
     */
-    
-    return BOOST;
+    const auto &accel_desc = ctx->accel.descriptor();
+    if (accel_desc.timestamp != data->lastAccelReadingTime) {
+        data->lastAccelReadingTime = accel_desc.timestamp;
+        if(data->accelDebouncer.update(accel_desc.data.accelZ > LAUNCH_TRHESHOLD, millis())) {
+            return BOOST;
+        }
+    }
+
+    if(ctx->sdInitialized && ctx->logFile != NULL)  {
+        // blink
+        if((millis() - lastBlueToggleTime) > 250) {
+            lastBlueToggleTime = millis();
+            BlueLedState = !BlueLedState;
+            digitalWrite(BLUE_LED_PIN, BlueLedState);
+        }
+    }
+
+    const auto &gps_desc = ctx->gps.descriptor();
+
+    if(gps_desc.data.gpsLockType == 3) {
+        if((millis() - lastGreenToggleTime) > 250) {
+            lastGreenToggleTime = millis();
+            GreenLedState = !GreenLedState;
+            digitalWrite(GREEN_LED_PIN, GreenLedState);
+        }
+    }
+
+
+    return PRELAUNCH;
 }
