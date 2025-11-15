@@ -11,8 +11,8 @@ enum class SensorDataType : uint8_t {
 };
 
 // Forward declarations
-class ASM330;
-class LPS22;
+// class ASM330;
+// class LPS22;
 
 // Sensor data descriptor
 template <typename T> 

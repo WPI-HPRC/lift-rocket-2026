@@ -24,7 +24,7 @@ StateID boostLoop (StateData* data, Context* ctx) {
     - Update sensor data and ctx for next iteration?
     */
     const auto &accel_desc = ctx->accel.descriptor();
-    if (accel_desc.timestamp != data->lastAccelReadingTime && data->currentTime > 2500) {
+    if (accel_desc.timestamp != data->lastAccelReadingTime && data->currentTime > 2000) {
         data->lastAccelReadingTime = accel_desc.timestamp;
         if(data->accelDebouncer.update(accel_desc.data.accelZ < COAST_THRESHOLD , millis())) {
             return COAST;

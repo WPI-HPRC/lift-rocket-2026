@@ -1,7 +1,7 @@
 #include <SdFat.h>
-#include "Context.h"
 #include <stdint.h>
 #include "logging.h"
+#include "Sensors/ASM330.h"
 #include "config.h"
 
 size_t dataLengths[] = {
@@ -48,12 +48,71 @@ bool initializeLogging(Context *ctx) {
     }
 }
 
-void writePacket(Context *ctx, SensorData data, SensorType type) {
-    Packet packetToWrite = { type, millis(), data};
+void loggingLoop(Context *ctx) {
+    static long lastTimeFlushedFiles = 0;
+
+    if (millis() - lastTimeFlushedFiles >= 2000) {
+        lastTimeFlushedFiles = millis();
+        ctx->errorLogFile.flush();
+        ctx->logFile.flush();
+    }
+
+    static long lastAccelDataAt = 0;
+    const auto &accel_desc = ctx->accel.descriptor();
+    if (accel_desc.timestamp > lastAccelDataAt) {
+        lastAccelDataAt = accel_desc.timestamp;
+        SensorData d = {
+            .asm330 = accel_desc.data
+        };
+        writePacket(ctx, accel_desc.timestamp, d, ASM330_TAG);
+    }
+
+    static long lastBaroDataAt = 0;
+    const auto &baro_desc = ctx->baro.descriptor();
+    if (baro_desc.timestamp > lastBaroDataAt) {
+        lastBaroDataAt = baro_desc.timestamp;
+        SensorData d = {
+            .lps22 = baro_desc.data
+        };
+        writePacket(ctx, baro_desc.timestamp, d, LPS22_TAG);
+    }
+
+    static long lastMagDataAt = 0;
+    const auto &mag_desc = ctx->mag.descriptor();
+    if (mag_desc.timestamp > lastMagDataAt) {
+        lastMagDataAt = mag_desc.timestamp;
+        SensorData d = {
+            .icm20948 = mag_desc.data
+        };
+        writePacket(ctx, mag_desc.timestamp, d, ICM20948_TAG);
+    }
+
+    static long lastGpsDataAt = 0;
+    const auto &gps_desc = ctx->gps.descriptor();
+    if (gps_desc.timestamp > lastGpsDataAt) {
+        lastGpsDataAt = gps_desc.timestamp;
+        SensorData d = {
+            .max10s = gps_desc.data
+        };
+        writePacket(ctx, gps_desc.timestamp, d, MAX10S_TAG);
+    }
+
+    static long lastCurrentDataAt = 0;
+    const auto &curr_desc = ctx->curr.descriptor();
+    if (curr_desc.timestamp > lastCurrentDataAt) {
+        lastCurrentDataAt = curr_desc.timestamp;
+        SensorData d = {
+            .ina219 = curr_desc.data
+        };
+        writePacket(ctx, curr_desc.timestamp, d, INA219_TAG);
+    }
+}
+
+void writePacket(Context *ctx, uint32_t timestamp, SensorData data, SensorType type) {
+    Packet packetToWrite = { type, timestamp, data};
 
     size_t length = sizeof(uint8_t) + sizeof(uint32_t) + dataLengths[type];
 
     ctx->logFile.write(&packetToWrite, length);
-    ctx->logFile.flush();
 }
 

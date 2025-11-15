@@ -63,6 +63,8 @@ void sensorsSetup() {
     // Initialize all sensors
     manager.init_all();
 
+    Wire.setClock(400000);
+
     Serial.println("\n=== Sensor Initialization Summary ===");
     Serial.print("Total sensors: ");
     Serial.println(manager.count());
@@ -75,6 +77,10 @@ void sensorLoop() {
 
     // Update all sensors through manager
     manager.update_all();
+
+    if (currentState >= PRELAUNCH) {
+        return;
+    }
 
     // manager is not being used here to get data
     if (millis() - last_print > 200)
@@ -97,11 +103,6 @@ void sensorLoop() {
         // Print ASM330 data
         if (accel_desc.timestamp > 0)
         {
-            SensorData d = {
-                .asm330 = accel_desc.data
-            };
-
-            writePacket(&ctx, d, ASM330_TAG);
             Serial.print("ASM330 - Accel: ");
             Serial.print(accel_desc.data.accelX, 4);
             Serial.print(", ");
@@ -125,11 +126,6 @@ void sensorLoop() {
         // Print LPS22 data
         if (baro_desc.timestamp > 0)
         {
-            SensorData d = {
-                .lps22 = baro_desc.data
-            };
-
-            writePacket(&ctx, d, LPS22_TAG);
             Serial.print("LPS22 - Pressure: ");
             Serial.print(baro_desc.data.pressure, 4);
             Serial.print(" hPa, Temp: ");
@@ -144,10 +140,6 @@ void sensorLoop() {
 
         if(mag_desc.timestamp > 0)
         {
-            SensorData d = {
-                .icm20948 = mag_desc.data
-            };
-            writePacket(&ctx, d, ICM20948_TAG);
             Serial.print("ICM20948 - Accel: ");
             Serial.print(mag_desc.data.accelX, 4);
             Serial.print(", ");
@@ -170,10 +162,6 @@ void sensorLoop() {
 
         if(gps_desc.timestamp > 0)
         {
-            SensorData d = {
-                .max10s = gps_desc.data
-            };
-            writePacket(&ctx, d, MAX10S_TAG);
             Serial.print("MAX10S - Lat, Lon, AltMSL, AltElipsoid: ");
             Serial.print(gps_desc.data.lat, 4);
             Serial.print(", ");
@@ -193,10 +181,6 @@ void sensorLoop() {
         }
 
         if(curr_desc.timestamp > 0) {
-            SensorData d = {
-                .ina219 = curr_desc.data
-            };
-            writePacket(&ctx, d, INA219_TAG);
             Serial.print("INA219 - Curr: ");
             Serial.println(curr_desc.data.curr, 4);
             has_data = true;
@@ -259,4 +243,5 @@ void loop() {
     }
 
     sensorLoop();
+    loggingLoop(&ctx);
 }

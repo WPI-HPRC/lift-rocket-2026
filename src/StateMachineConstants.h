@@ -1,6 +1,6 @@
 #pragma once
 
-constexpr float LAUNCH_TRHESHOLD = 2;
+constexpr float LAUNCH_TRHESHOLD = 5;
 
 constexpr float COAST_THRESHOLD = 0.3f;
 

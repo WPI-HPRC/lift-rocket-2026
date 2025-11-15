@@ -22,8 +22,8 @@ struct StateData {
     long long lastLoopTime;
     uint32_t lastAccelReadingTime;
     uint32_t lastBaroReadingTime;
-    Debouncer baroDebouncer = Debouncer(500);
-    Debouncer accelDebouncer = Debouncer(500);
+    Debouncer baroDebouncer = Debouncer(20);
+    Debouncer accelDebouncer = Debouncer(20);
 };
 
 typedef void (*StateInitFunc)(StateData *data);

@@ -6,6 +6,7 @@
 #include "Sensors/ICM20948.h"
 #include "Sensors/MAX10S.h"
 #include "Sensors/INA219.h"
+#include "Context.h"
 
 enum SensorType {
     ASM330_TAG = 0,
@@ -24,13 +25,16 @@ union SensorData {
 };
 
 
-#pragma pack(1)
+#pragma pack(push, 1)
 struct Packet {
     uint8_t id; // NOTE: should identify the sensor and the length of this packet
     uint32_t timeStamp;
     SensorData data;
 };
+#pragma pack(pop)
 
 bool initializeLogging(Context *ctx);
 
-void writePacket(Context *ctx, SensorData data, SensorType type);
+void loggingLoop(Context *ctx);
+
+void writePacket(Context *ctx, uint32_t timestamp, SensorData data, SensorType type);
