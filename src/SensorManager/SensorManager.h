@@ -27,6 +27,7 @@ public:
         tuple_for_each(sensors_, [&](auto& s) {
             ok = ok && s.init();
         });
+        sensorCount_ = std::tuple_size<decltype(sensors_)>::value;
         return ok;
     }
 
@@ -40,11 +41,13 @@ public:
         });
     }
 
+    //TODO: fix size_t to the proper type
     size_t count() const {
-        return std::tuple_size<decltype(sensors_)>::value;
+        return sensorCount_;
     }
 
 private:
     MillisFn millis_;
     std::tuple<Sensors&...> sensors_;
+    size_t sensorCount_;
 };
