@@ -29,6 +29,8 @@ public:
     }
 
     // Access to the data
+    // const version allows for read only access to the data
+    // non-const version allows for read and write access to the data
     const descriptor_type& get_descriptor() const { return data_; }
     descriptor_type& get_descriptor() { return data_; }
 

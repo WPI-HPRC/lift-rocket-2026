@@ -40,6 +40,10 @@ public:
         });
     }
 
+    size_t count() const {
+        return std::tuple_size<decltype(sensors_)>::value;
+    }
+
 private:
     MillisFn millis_;
     std::tuple<Sensors&...> sensors_;

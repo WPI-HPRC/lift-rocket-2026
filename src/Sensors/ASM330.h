@@ -8,10 +8,12 @@ struct ASM330Data {
   float accelX, accelY, accelZ, gyrX, gyrY, gyrZ;
 };
 
+#define ASM330_POLLING_RATE 26
+
 class ASM330 : public SensorBase<ASM330, ASM330Data>{
 public:
   ASM330()
-      : SensorBase<ASM330, ASM330Data>(26),
+      : SensorBase<ASM330, ASM330Data>(ASM330_POLLING_RATE),
         AccGyr(&Wire, ASM330LHH_I2C_ADD_H) {}
 
   void init_impl() {

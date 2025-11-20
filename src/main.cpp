@@ -20,20 +20,9 @@ ICM20948 icm20948;
 MAX10S   max10s;
 INA219   ina219;
 
-SensorManager mgr{ millis(), asm330, lps22, icm20948, max10s, ina219 };
+uint32_t millisSource() { return millis(); }
+SensorManager mgr{ millisSource, asm330, lps22, icm20948, max10s, ina219 };
 
-Context ctx = {
-    .sd = SdFs(),
-    .sdInitialized = false,
-    .accel = asm330,
-    .baro = lps22,
-    .mag = icm20948,
-    .gps = max10s,
-    .curr = ina219
-};
-
-// Create Sensor manager 
-SensorManager manager;
 
 StateID currentState;
 StateData data;
@@ -55,21 +44,13 @@ void sensorsSetup() {
     Serial.print(", SCL: ");
     Serial.println(SENSOR_SCL);
 
-    // Add sensors to manager
-    manager.add_sensor(&ctx.accel);
-    manager.add_sensor(&ctx.mag);
-    manager.add_sensor(&ctx.baro);
-    manager.add_sensor(&ctx.gps);
-    manager.add_sensor(&ctx.curr);
-
-    // Initialize all sensors
-    manager.init_all();
+    mgr.sensorInit();
 
     Wire.setClock(400000);
 
     Serial.println("\n=== Sensor Initialization Summary ===");
     Serial.print("Total sensors: ");
-    Serial.println(manager.count());
+    Serial.println(mgr.count());
     Serial.println("=== Starting main loop ===\n");
 }
 
@@ -78,7 +59,7 @@ void sensorLoop() {
     static int loop_count = 0;
 
     // Update all sensors through manager
-    manager.update_all();
+    manager.loop();
 
     if (currentState >= PRELAUNCH) {
         return;
@@ -95,11 +76,11 @@ void sensorLoop() {
         Serial.println(" ===");
 
         // DIRECT ACCESS to sensor data - this is guaranteed to work
-        const auto &accel_desc = ctx.accel.descriptor();
-        const auto &baro_desc = ctx.baro.descriptor();
-        const auto &mag_desc = ctx.mag.descriptor();
-        const auto &gps_desc = ctx.gps.descriptor();
-        const auto &curr_desc = ctx.curr.descriptor();
+        const auto &accel_desc = asm330.get_descriptor();
+        const auto &baro_desc = lps22.get_descriptor();
+        const auto &mag_desc = icm20948.get_descriptor();
+        const auto &gps_desc = max10s.get_descriptor();
+        const auto &curr_desc = ina219.get_descriptor();
 
         bool has_data = false;
         // Print ASM330 data
