@@ -14,11 +14,13 @@
 #include "logging.h"
 
 // Create Sensor Objects
-ASM330 asm330;
-LPS22 lps22;
+ASM330   asm330;
+LPS22    lps22;
 ICM20948 icm20948;
-MAX10S max10s;
-INA219 ina219;
+MAX10S   max10s;
+INA219   ina219;
+
+SensorManager mgr{ millis(), asm330, lps22, icm20948, max10s, ina219 };
 
 Context ctx = {
     .sd = SdFs(),

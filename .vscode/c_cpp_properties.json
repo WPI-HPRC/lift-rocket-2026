@@ -8,15 +8,15 @@
         {
             "name": "PlatformIO",
             "includePath": [
-                "/Users/liambruhin/hprc/lift-rocket-2026/include",
-                "/Users/liambruhin/hprc/lift-rocket-2026/src",
+                "C:/Users/rohan/Documents/GitHub/HPRC/lift-rocket-2026/include",
+                "C:/Users/rohan/Documents/GitHub/HPRC/lift-rocket-2026/src",
                 ""
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
-                    "/Users/liambruhin/hprc/lift-rocket-2026/include",
-                    "/Users/liambruhin/hprc/lift-rocket-2026/src",
+                    "C:/Users/rohan/Documents/GitHub/HPRC/lift-rocket-2026/include",
+                    "C:/Users/rohan/Documents/GitHub/HPRC/lift-rocket-2026/src",
                     ""
                 ]
             },
@@ -24,7 +24,7 @@
                 "PLATFORMIO=60118",
                 ""
             ],
-            "compilerPath": "/usr/bin/gcc",
+            "compilerPath": "C:/msys64/ucrt64/bin/gcc.exe",
             "compilerArgs": [
                 ""
             ]
