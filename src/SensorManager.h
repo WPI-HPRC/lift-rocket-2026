@@ -45,6 +45,7 @@ public:
   }
 
   void update() {
+    // put time things here???
     static_cast<Derived *>(this)->update_impl(descriptor_);
   }
 
@@ -86,6 +87,7 @@ public:
 
   // Initialize all sensors
   void init_all() {
+    // tuples here as well
     for (int i = 0; i < sensor_count_; i++) {
       sensors_[i]->init();
     }
@@ -93,6 +95,7 @@ public:
 
   // Update all sensors
   void update_all() {
+    // tuples here or somerihng idk ask Rohan
     for (int i = 0; i < sensor_count_; i++) {
       sensors_[i]->update();
     }
@@ -129,6 +132,6 @@ public:
 
 private:
   static constexpr int MAX_SENSORS = 8;
-  ISensor* sensors_[MAX_SENSORS] = {nullptr};
+  ISensor* sensors_[MAX_SENSORS] = {nullptr}; // this is bad
   int sensor_count_ = 0;
 };
