@@ -18,14 +18,13 @@ struct MAX10SData {
     uint8_t gpsLockType;
 };
 
-template<class SensorBaseType>
-class MAX10S: public SensorBaseType {
+class MAX10S: public Sensor<MAX10S, MAX10SData> {
 public:
     using DataType = MAX10SData;
     // static constexpr SensorDataType TYPE = SensorDataType::GPS;
 
     MAX10S() // 25
-        : SensorBaseType(40),
+        : Sensor(40),
           GPS()//, last_update_ms_(0), poll_interval_ms_(1000 / info_.poll_rate_hz) {}
           {}
 
@@ -47,7 +46,7 @@ public:
         out.lat = (float)GPS.getLatitude() / 1e7;
         out.lon = (float)GPS.getLongitude() / 1e7;
         out.altMSL = (float) GPS.getAltitudeMSL() / 1000.0;
-        out.altEllipsoid = (float) GPS.getAltitude / 1000.0;
+        out.altEllipsoid = (float) GPS.getAltitude() / 1000.0;
         out.velN = GPS.getNedNorthVel();
         out.velE = GPS.getNedEastVel();
         out.velD = GPS.getNedDownVel();

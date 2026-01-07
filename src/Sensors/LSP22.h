@@ -11,11 +11,10 @@ struct LPS22Data {
   double temp;
 };
 
-template<class SensorBaseType>
-class LPS22 : public SensorBaseType {
+class LPS22 : public Sensor<LPS22, LPS22Data> {
 public:
   LPS22() // 50
-      : SensorBaseType(50), lps() {}
+      : Sensor(50), lps() {}
 
   bool init_impl() {
     Serial.print("Initializing LPS22... ");

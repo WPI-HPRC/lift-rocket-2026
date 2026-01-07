@@ -3,7 +3,7 @@
 
 template<typename T>
 struct SensorData {
-    T value{}; // actual sensor data
+    T data{}; // actual sensor data
     uint32_t lastUpdated{0}; // use millis()
 
     uint32_t getLastUpdated() const { return lastUpdated; }

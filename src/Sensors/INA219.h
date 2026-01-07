@@ -12,21 +12,20 @@ struct INA219Data {
   float curr;
 };
 
-template<class SensorBaseType>
-class INA219 : public SensorBaseType {
+class INA219 : public Sensor<INA219, INA219Data> {
 public:
   // using DataType = INA219Data;
   // static constexpr SensorDataType TYPE = SensorDataType::CURR;
 
   INA219()
-      : SensorBaseType(10), // not sure if 10 is the right time
+      : Sensor(10), // not sure if 10 is the right time
         ina219() {};
 
   // INA219()
   //     : SensorBase<INA219, INA219Data>({TYPE, "INA219", 100}), ina219(),
   //       last_update_ms_(0), poll_interval_ms_(1000 / info_.poll_rate_hz) {}
 
-  bool operatorinit_impl() {
+  bool init_impl() {
     Serial.print("Initializing for INA219... ");
 
     if (!ina219.begin()) {

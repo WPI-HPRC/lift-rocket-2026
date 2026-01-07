@@ -1,7 +1,7 @@
 #include <SdFat.h>
 #include <stdint.h>
 #include "logging.h"
-#include "Sensors/ASM330.h"
+//#include "Sensors/ASM330.h"
 #include "config.h"
 
 size_t dataLengths[] = {
@@ -58,57 +58,57 @@ void loggingLoop(Context *ctx) {
     }
 
     static long lastAccelDataAt = 0;
-    const auto &accel_desc = ctx->accel.descriptor();
-    if (accel_desc.timestamp > lastAccelDataAt) {
-        lastAccelDataAt = accel_desc.timestamp;
-        SensorData d = {
+    const auto &accel_desc = ctx->accel.get_descriptor();
+    if (accel_desc.getLastUpdated() > lastAccelDataAt) {
+        lastAccelDataAt = accel_desc.getLastUpdated();
+        LogSensorData d = {
             .asm330 = accel_desc.data
         };
-        writePacket(ctx, accel_desc.timestamp, d, ASM330_TAG);
+        writePacket(ctx, lastAccelDataAt, d, ASM330_TAG);
     }
 
     static long lastBaroDataAt = 0;
-    const auto &baro_desc = ctx->baro.descriptor();
-    if (baro_desc.timestamp > lastBaroDataAt) {
-        lastBaroDataAt = baro_desc.timestamp;
-        SensorData d = {
+    const auto &baro_desc = ctx->baro.get_descriptor();
+    if (baro_desc.getLastUpdated() > lastBaroDataAt) {
+        lastBaroDataAt = baro_desc.getLastUpdated();
+        LogSensorData d = {
             .lps22 = baro_desc.data
         };
-        writePacket(ctx, baro_desc.timestamp, d, LPS22_TAG);
+        writePacket(ctx, lastBaroDataAt, d, LPS22_TAG);
     }
 
     static long lastMagDataAt = 0;
-    const auto &mag_desc = ctx->mag.descriptor();
-    if (mag_desc.timestamp > lastMagDataAt) {
-        lastMagDataAt = mag_desc.timestamp;
-        SensorData d = {
+    const auto &mag_desc = ctx->mag.get_descriptor();
+    if (mag_desc.getLastUpdated() > lastMagDataAt) {
+        lastMagDataAt = mag_desc.getLastUpdated();
+        LogSensorData d = {
             .icm20948 = mag_desc.data
         };
-        writePacket(ctx, mag_desc.timestamp, d, ICM20948_TAG);
+        writePacket(ctx, lastMagDataAt, d, ICM20948_TAG);
     }
 
     static long lastGpsDataAt = 0;
-    const auto &gps_desc = ctx->gps.descriptor();
-    if (gps_desc.timestamp > lastGpsDataAt) {
-        lastGpsDataAt = gps_desc.timestamp;
-        SensorData d = {
+    const auto &gps_desc = ctx->gps.get_descriptor();
+    if (gps_desc.getLastUpdated() > lastGpsDataAt) {
+        lastGpsDataAt = gps_desc.getLastUpdated();
+        LogSensorData d = {
             .max10s = gps_desc.data
         };
-        writePacket(ctx, gps_desc.timestamp, d, MAX10S_TAG);
+        writePacket(ctx, lastGpsDataAt, d, MAX10S_TAG);
     }
 
     static long lastCurrentDataAt = 0;
-    const auto &curr_desc = ctx->curr.descriptor();
-    if (curr_desc.timestamp > lastCurrentDataAt) {
-        lastCurrentDataAt = curr_desc.timestamp;
-        SensorData d = {
+    const auto &curr_desc = ctx->curr.get_descriptor();
+    if (curr_desc.getLastUpdated() > lastCurrentDataAt) {
+        lastCurrentDataAt = curr_desc.getLastUpdated();
+        LogSensorData d = {
             .ina219 = curr_desc.data
         };
-        writePacket(ctx, curr_desc.timestamp, d, INA219_TAG);
+        writePacket(ctx, lastCurrentDataAt, d, INA219_TAG);
     }
 }
 
-void writePacket(Context *ctx, uint32_t timestamp, SensorData data, SensorType type) {
+void writePacket(Context *ctx, uint32_t timestamp, LogSensorData data, SensorType type) {
     Packet packetToWrite = { type, timestamp, data};
 
     size_t length = sizeof(uint8_t) + sizeof(uint32_t) + dataLengths[type];

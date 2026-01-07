@@ -4,24 +4,27 @@
 #include "States.h"
 
 #include "SensorManager/SensorManager.h"
-#include "Sensors/LSP22.h"
-#include "Sensors/ASM330.h"
-#include "Sensors/ICM20948.h"
-#include "Sensors/MAX10S.h"
-#include "Sensors/INA219.h"
+//#include "Sensors/LSP22.h"
+//#include "Sensors/ASM330.h"
+//#include "Sensors/ICM20948.h"
+//#include "Sensors/MAX10S.h"
+//#include "Sensors/INA219.h"
 #include "config.h"
 
 #include "logging.h"
 
-// Create Sensor Objects
-ASM330   asm330;
-LPS22    lps22;
-ICM20948 icm20948;
-MAX10S   max10s;
-INA219   ina219;
+Context ctx;
 
 uint32_t millisSource() { return millis(); }
-SensorManager mgr{ millisSource, asm330, lps22, icm20948, max10s, ina219 };
+
+SensorManager mgr {
+    millisSource,
+    ctx.accel,
+    ctx.baro,
+    ctx.mag,
+    ctx.gps,
+    ctx.curr,
+};
 
 
 StateID currentState;
@@ -59,7 +62,7 @@ void sensorLoop() {
     static int loop_count = 0;
 
     // Update all sensors through manager
-    manager.loop();
+    mgr.loop();
 
     if (currentState >= PRELAUNCH) {
         return;
@@ -76,15 +79,15 @@ void sensorLoop() {
         Serial.println(" ===");
 
         // DIRECT ACCESS to sensor data - this is guaranteed to work
-        const auto &accel_desc = asm330.get_descriptor();
-        const auto &baro_desc = lps22.get_descriptor();
-        const auto &mag_desc = icm20948.get_descriptor();
-        const auto &gps_desc = max10s.get_descriptor();
-        const auto &curr_desc = ina219.get_descriptor();
+        const auto &accel_desc = ctx.accel.get_descriptor();
+        const auto &baro_desc = ctx.baro.get_descriptor();
+        const auto &mag_desc = ctx.mag.get_descriptor();
+        const auto &gps_desc = ctx.gps.get_descriptor();
+        const auto &curr_desc = ctx.curr.get_descriptor();
 
         bool has_data = false;
         // Print ASM330 data
-        if (accel_desc.timestamp > 0)
+        if (accel_desc.getLastUpdated() > 0)
         {
             Serial.print("ASM330 - Accel: ");
             Serial.print(accel_desc.data.accelX, 4);
@@ -107,12 +110,12 @@ void sensorLoop() {
         }
 
         // Print LPS22 data
-        if (baro_desc.timestamp > 0)
+        if (baro_desc.getLastUpdated() > 0)
         {
             Serial.print("LPS22 - Pressure: ");
             Serial.print(baro_desc.data.pressure, 4);
             Serial.print(" hPa, Temp: ");
-            Serial.print(baro_desc.data.temperature, 4);
+            Serial.print(baro_desc.data.temp, 4);
             Serial.println(" C");
             has_data = true;
         }
@@ -121,7 +124,7 @@ void sensorLoop() {
             Serial.println("LPS22: No data (timestamp = 0)");
         }
 
-        if(mag_desc.timestamp > 0)
+        if(mag_desc.getLastUpdated()  > 0)
         {
             Serial.print("ICM20948 - Accel: ");
             Serial.print(mag_desc.data.accelX, 4);
@@ -143,7 +146,7 @@ void sensorLoop() {
             Serial.println("ICM20948: No data (timestamp = 0)");
         }
 
-        if(gps_desc.timestamp > 0)
+        if(gps_desc.getLastUpdated() > 0)
         {
             Serial.print("MAX10S - Lat, Lon, AltMSL, AltElipsoid: ");
             Serial.print(gps_desc.data.lat, 4);
@@ -163,7 +166,7 @@ void sensorLoop() {
             Serial.println("MAX10S: No data (timestamp = 0)");
         }
 
-        if(curr_desc.timestamp > 0) {
+        if(curr_desc.getLastUpdated() > 0) {
             Serial.print("INA219 - Curr: ");
             Serial.println(curr_desc.data.curr, 4);
             has_data = true;

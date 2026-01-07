@@ -11,19 +11,18 @@ struct ASM330Data {
 
 #define ASM330_POLLING_RATE 26
 
-template<class SensorBaseType>
-class ASM330 : public SensorBaseType {
+class ASM330 : public Sensor<ASM330, ASM330Data> {
 public:
   ASM330()
-      : SensorBaseType(ASM330_POLLING_RATE),
+      : Sensor(ASM330_POLLING_RATE),
         AccGyr(&Wire, ASM330LHH_I2C_ADD_H) {}
 
-  void init_impl() {
+  bool init_impl() {
     Serial.print("Initializing ASM330... ");
 
     if (AccGyr.begin() != 0) {
       Serial.println("FAILED");
-      return;
+      return false;
     }
 
     AccGyr.Set_X_ODR(26.0f);
@@ -37,6 +36,7 @@ public:
     AccGyr.Get_X_ODR(&odr);
     //this->pollingPeriodMs_ = (odr > 0.0f) ? 1000.0f / odr : 40.0f; // is this needed?
     Serial.println("OK");
+    return true;
   }
 
   void poll_impl(uint32_t now_ms, ASM330Data &out) {
