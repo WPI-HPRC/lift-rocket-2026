@@ -3,7 +3,7 @@
 #include "State.h"
 #include "States.h"
 
-#include "SensorManager.h"
+#include "SensorManager/SensorManager.h"
 #include "Sensors/LSP22.h"
 #include "Sensors/ASM330.h"
 #include "Sensors/ICM20948.h"

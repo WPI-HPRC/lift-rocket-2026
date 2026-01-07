@@ -1,62 +1,48 @@
 #pragma once
 
 #include "Adafruit_INA219.h"
-#include "SensorManager.h"
+#include "../SensorManager/SensorBase.h"
 #include <Arduino.h>
 #include <Wire.h>
+#include "Adafruit_INA219.h"
+
+// #define INA219_POLLING_RATE
 
 struct INA219Data {
   float curr;
 };
 
-class INA219 : public SensorBase<INA219, INA219Data>, public ISensor {
+template<class SensorBaseType>
+class INA219 : public SensorBaseType {
 public:
-  using DataType = INA219Data;
-  static constexpr SensorDataType TYPE = SensorDataType::CURR;
+  // using DataType = INA219Data;
+  // static constexpr SensorDataType TYPE = SensorDataType::CURR;
 
   INA219()
-      : SensorBase<INA219, INA219Data>({TYPE, "INA219", 100}), ina219(),
-        last_update_ms_(0), poll_interval_ms_(1000 / info_.poll_rate_hz) {}
+      : SensorBaseType(10), // not sure if 10 is the right time
+        ina219() {};
 
-  void init_impl() {
+  // INA219()
+  //     : SensorBase<INA219, INA219Data>({TYPE, "INA219", 100}), ina219(),
+  //       last_update_ms_(0), poll_interval_ms_(1000 / info_.poll_rate_hz) {}
+
+  bool operatorinit_impl() {
     Serial.print("Initializing for INA219... ");
 
     if (!ina219.begin()) {
       Serial.println("FAILED");
-      return;
+      return false;
     }
     Serial.println("OK");
-    return;
+    return true;
   }
 
-  void update_impl(SensorDataDescriptor<DataType> &desc) {
-    unsigned long now = millis();
-
-    if (last_update_ms_ == 0) {
-      last_update_ms_ = now;
-    }
-
-    if (now - last_update_ms_ < poll_interval_ms_) {
-      return;
-    }
-    last_update_ms_ = now;
-
+  void poll_impl(uint32_t now_ms, INA219Data &out) {
     float current_mA = ina219.getCurrent_mA();
 
-    desc.data.curr = current_mA;
-    desc.timestamp = now;
+    out.curr = current_mA;
   }
-
-  // ISensor interface implementation
-  void init() override { init_impl(); }
-  void update() override { update_impl(descriptor_); }
-  SensorDataType type() const override { return TYPE; }
-  const char *name() const override { return info_.name; }
-  const void* get_descriptor_ptr() const override { return &descriptor_; }
-
 
 private:
   Adafruit_INA219 ina219;
-  unsigned long last_update_ms_;
-  unsigned long poll_interval_ms_;
 };
