@@ -6,7 +6,7 @@
 #include <Wire.h>
 
 struct ASM330Data {
-  float accelX, accelY, accelZ, gyrX, gyrY, gyrZ;
+  float accel0, accel1, accel2, gyr0, gyr1, gyr2;
 };
 
 #define ASM330_POLLING_RATE 26
@@ -48,12 +48,12 @@ public:
     AccGyr.Get_X_Axes(accel);
     AccGyr.Get_G_Axes(gyro);
 
-    out.accelX = (float)accel[2] / 1000.0f;
-    out.accelY = -(float)accel[0] / 1000.0f;
-    out.accelZ = -(float)accel[1] / 1000.0f;
-    out.gyrX = (float)gyro[2] / 1000.0f;
-    out.gyrY = -(float)gyro[0] / 1000.0f;
-    out.gyrZ = -(float)gyro[1] / 1000.0f;
+    out.accel0 = (float)accel[0];
+    out.accel1 = (float)accel[1]; 
+    out.accel2 = (float)accel[2];    
+    out.gyr0 = (float)gyro[0];
+    out.gyr1 = (float)gyro[1];
+    out.gyr2 = (float)gyro[2]; 
   }
 
 private:
