@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SensorManager.h"
+#include "../SensorManager/SensorBase.h"
 #include <Adafruit_LPS2X.h>
 #include <Adafruit_Sensor.h>
 #include <Arduino.h>
@@ -8,60 +8,37 @@
 
 struct LPS22Data {
   double pressure;
-  double temperature;
+  double temp;
 };
 
-class LPS22 : public SensorBase<LPS22, LPS22Data>, public ISensor {
+class LPS22 : public Sensor<LPS22, LPS22Data> {
 public:
-  using DataType = LPS22Data;
-  static constexpr SensorDataType TYPE = SensorDataType::BARO;
+  LPS22() // 50
+      : Sensor(50), lps() {}
 
-  LPS22()
-      : SensorBase<LPS22, LPS22Data>({TYPE, "LPS22", 20}), lps(),
-        last_update_ms_(0), poll_interval_ms_(1000 / info_.poll_rate_hz) {}
-
-  void init_impl() {
+  bool init_impl() {
     Serial.print("Initializing LPS22... ");
 
     if (!lps.begin_I2C(0x5C)) {
       Serial.println("FAILED");
-      return;
+      return false;
     }
 
     lps.setDataRate(LPS22_RATE_50_HZ);
-    poll_interval_ms_ = 1000 / info_.poll_rate_hz;
+    //poll_interval_ms_ = 1000 / info_.poll_rate_hz;
     Serial.println("OK");
+
+    return true;
   }
 
-  void update_impl(SensorDataDescriptor<DataType> &desc) {
-    unsigned long now = millis();
-
-    if (last_update_ms_ == 0) {
-      last_update_ms_ = now;
-    }
-
-    if (now - last_update_ms_ < poll_interval_ms_) {
-      return;
-    }
-    last_update_ms_ = now;
-
+  void poll_impl(uint32_t now_ms, LPS22Data &out) {
     sensors_event_t pressure, temperature;
     if (lps.getEvent(&pressure, &temperature)) {
-      desc.data.pressure = pressure.pressure;
-      desc.data.temperature = temperature.temperature;
-      desc.timestamp = now;
+      out.pressure = pressure.pressure;
+      out.temp = temperature.temperature;
     }
   }
-
-  // ISensor interface implementation
-  void init() override { init_impl(); }
-  void update() override { update_impl(descriptor_); }
-  SensorDataType type() const override { return TYPE; }
-  const char *name() const override { return info_.name; }
-  const void* get_descriptor_ptr() const override { return &descriptor_; }
 
 private:
   Adafruit_LPS22 lps;
-  unsigned long last_update_ms_;
-  unsigned long poll_interval_ms_;
 };

@@ -3,35 +3,29 @@
 #include "State.h"
 #include "States.h"
 
-#include "SensorManager.h"
-#include "Sensors/LSP22.h"
-#include "Sensors/ASM330.h"
-#include "Sensors/ICM20948.h"
-#include "Sensors/MAX10S.h"
-#include "Sensors/INA219.h"
+#include "SensorManager/SensorManager.h"
+//#include "Sensors/LSP22.h"
+//#include "Sensors/ASM330.h"
+//#include "Sensors/ICM20948.h"
+//#include "Sensors/MAX10S.h"
+//#include "Sensors/INA219.h"
 #include "config.h"
 
 #include "logging.h"
 
-// Create Sensor Objects
-ASM330 asm330;
-LPS22 lps22;
-ICM20948 icm20948;
-MAX10S max10s;
-INA219 ina219;
+Context ctx;
 
-Context ctx = {
-    .sd = SdFs(),
-    .sdInitialized = false,
-    .accel = asm330,
-    .baro = lps22,
-    .mag = icm20948,
-    .gps = max10s,
-    .curr = ina219
+uint32_t millisSource() { return millis(); }
+
+SensorManager mgr {
+    millisSource,
+    ctx.accel,
+    ctx.baro,
+    ctx.mag,
+    ctx.gps,
+    ctx.curr,
 };
 
-// Create Sensor manager 
-SensorManager manager;
 
 StateID currentState;
 StateData data;
@@ -41,6 +35,9 @@ StateLoopFunc loopFuncs[NUM_STATES] = {};
 
 void sensorsSetup() {
     Serial.begin(115200);
+    while(!Serial) {
+        delay(10);
+    }
 
     Serial.println("Starting MARS board initialization...");
 
@@ -53,21 +50,13 @@ void sensorsSetup() {
     Serial.print(", SCL: ");
     Serial.println(SENSOR_SCL);
 
-    // Add sensors to manager
-    manager.add_sensor(&ctx.accel);
-    manager.add_sensor(&ctx.mag);
-    manager.add_sensor(&ctx.baro);
-    manager.add_sensor(&ctx.gps);
-    manager.add_sensor(&ctx.curr);
-
-    // Initialize all sensors
-    manager.init_all();
+    mgr.sensorInit();
 
     Wire.setClock(400000);
 
     Serial.println("\n=== Sensor Initialization Summary ===");
     Serial.print("Total sensors: ");
-    Serial.println(manager.count());
+    Serial.println(mgr.count());
     Serial.println("=== Starting main loop ===\n");
 }
 
@@ -76,11 +65,13 @@ void sensorLoop() {
     static int loop_count = 0;
 
     // Update all sensors through manager
-    manager.update_all();
+    mgr.loop();
 
+    /*
     if (currentState >= PRELAUNCH) {
         return;
     }
+    */
 
     // manager is not being used here to get data
     if (millis() - last_print > 200)
@@ -93,28 +84,28 @@ void sensorLoop() {
         Serial.println(" ===");
 
         // DIRECT ACCESS to sensor data - this is guaranteed to work
-        const auto &accel_desc = ctx.accel.descriptor();
-        const auto &baro_desc = ctx.baro.descriptor();
-        const auto &mag_desc = ctx.mag.descriptor();
-        const auto &gps_desc = ctx.gps.descriptor();
-        const auto &curr_desc = ctx.curr.descriptor();
+        const auto &accel_desc = ctx.accel.get_descriptor();
+        const auto &baro_desc = ctx.baro.get_descriptor();
+        const auto &mag_desc = ctx.mag.get_descriptor();
+        const auto &gps_desc = ctx.gps.get_descriptor();
+        const auto &curr_desc = ctx.curr.get_descriptor();
 
         bool has_data = false;
         // Print ASM330 data
-        if (accel_desc.timestamp > 0)
+        if (accel_desc.getLastUpdated() > 0)
         {
             Serial.print("ASM330 - Accel: ");
-            Serial.print(accel_desc.data.accelX, 4);
+            Serial.print(accel_desc.data.accel0, 4);
             Serial.print(", ");
-            Serial.print(accel_desc.data.accelY, 4);
+            Serial.print(accel_desc.data.accel1, 4);
             Serial.print(", ");
-            Serial.print(accel_desc.data.accelZ, 4);
+            Serial.print(accel_desc.data.accel2, 4);
             Serial.print(" | Gyro: ");
-            Serial.print(accel_desc.data.gyrX, 4);
+            Serial.print(accel_desc.data.gyr0, 4);
             Serial.print(", ");
-            Serial.print(accel_desc.data.gyrY, 4);
+            Serial.print(accel_desc.data.gyr1, 4);
             Serial.print(", ");
-            Serial.print(accel_desc.data.gyrZ, 4);
+            Serial.print(accel_desc.data.gyr2, 4);
             Serial.println();
             has_data = true;
         }
@@ -124,12 +115,12 @@ void sensorLoop() {
         }
 
         // Print LPS22 data
-        if (baro_desc.timestamp > 0)
+        if (baro_desc.getLastUpdated() > 0)
         {
             Serial.print("LPS22 - Pressure: ");
             Serial.print(baro_desc.data.pressure, 4);
             Serial.print(" hPa, Temp: ");
-            Serial.print(baro_desc.data.temperature, 4);
+            Serial.print(baro_desc.data.temp, 4);
             Serial.println(" C");
             has_data = true;
         }
@@ -138,20 +129,20 @@ void sensorLoop() {
             Serial.println("LPS22: No data (timestamp = 0)");
         }
 
-        if(mag_desc.timestamp > 0)
+        if(mag_desc.getLastUpdated()  > 0)
         {
             Serial.print("ICM20948 - Accel: ");
-            Serial.print(mag_desc.data.accelX, 4);
+            Serial.print(mag_desc.data.accel0, 4);
             Serial.print(", ");
-            Serial.print(mag_desc.data.accelY, 4);
+            Serial.print(mag_desc.data.accel1, 4);
             Serial.print(", ");
-            Serial.print(mag_desc.data.accelZ, 4);
+            Serial.print(mag_desc.data.accel2, 4);
             Serial.print(" | Gyro: ");
-            Serial.print(mag_desc.data.gyrX, 4);
+            Serial.print(mag_desc.data.gyr0, 4);
             Serial.print(", ");
-            Serial.print(mag_desc.data.gyrY, 4);
+            Serial.print(mag_desc.data.gyr1, 4);
             Serial.print(", ");
-            Serial.print(mag_desc.data.gyrZ, 4);
+            Serial.print(mag_desc.data.gyr2, 4);
             Serial.println();
             has_data = true;
         }
@@ -160,7 +151,7 @@ void sensorLoop() {
             Serial.println("ICM20948: No data (timestamp = 0)");
         }
 
-        if(gps_desc.timestamp > 0)
+        if(gps_desc.getLastUpdated() > 0)
         {
             Serial.print("MAX10S - Lat, Lon, AltMSL, AltElipsoid: ");
             Serial.print(gps_desc.data.lat, 4);
@@ -180,7 +171,7 @@ void sensorLoop() {
             Serial.println("MAX10S: No data (timestamp = 0)");
         }
 
-        if(curr_desc.timestamp > 0) {
+        if(curr_desc.getLastUpdated() > 0) {
             Serial.print("INA219 - Curr: ");
             Serial.println(curr_desc.data.curr, 4);
             has_data = true;

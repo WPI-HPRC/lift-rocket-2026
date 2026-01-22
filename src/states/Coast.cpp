@@ -53,9 +53,9 @@ StateID coastLoop (StateData* data, Context* ctx) {
         airBrakesDone = true;
     }
 
-    const auto &baro_desc = ctx->baro.descriptor();
-    if (baro_desc.timestamp != data->lastBaroReadingTime) {
-        data->lastBaroReadingTime = baro_desc.timestamp;
+    const auto &baro_desc = ctx->baro.get_descriptor();
+    if (baro_desc.getLastUpdated() != data->lastBaroReadingTime) {
+        data->lastBaroReadingTime = baro_desc.getLastUpdated();
         double currentAltitiude = solveAltitude(baro_desc.data.pressure);
         if(data->accelDebouncer.update((currentAltitiude - prevAltitude) < 0 ,millis()) && airBrakesDone) {
             return DROGUE_DESCENT;
