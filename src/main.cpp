@@ -35,6 +35,9 @@ StateLoopFunc loopFuncs[NUM_STATES] = {};
 
 void sensorsSetup() {
     Serial.begin(115200);
+    while(!Serial) {
+        delay(10);
+    }
 
     Serial.println("Starting MARS board initialization...");
 
@@ -64,9 +67,11 @@ void sensorLoop() {
     // Update all sensors through manager
     mgr.loop();
 
+    /*
     if (currentState >= PRELAUNCH) {
         return;
     }
+    */
 
     // manager is not being used here to get data
     if (millis() - last_print > 200)
@@ -90,17 +95,17 @@ void sensorLoop() {
         if (accel_desc.getLastUpdated() > 0)
         {
             Serial.print("ASM330 - Accel: ");
-            Serial.print(accel_desc.data.accelX, 4);
+            Serial.print(accel_desc.data.accel0, 4);
             Serial.print(", ");
-            Serial.print(accel_desc.data.accelY, 4);
+            Serial.print(accel_desc.data.accel1, 4);
             Serial.print(", ");
-            Serial.print(accel_desc.data.accelZ, 4);
+            Serial.print(accel_desc.data.accel2, 4);
             Serial.print(" | Gyro: ");
-            Serial.print(accel_desc.data.gyrX, 4);
+            Serial.print(accel_desc.data.gyr0, 4);
             Serial.print(", ");
-            Serial.print(accel_desc.data.gyrY, 4);
+            Serial.print(accel_desc.data.gyr1, 4);
             Serial.print(", ");
-            Serial.print(accel_desc.data.gyrZ, 4);
+            Serial.print(accel_desc.data.gyr2, 4);
             Serial.println();
             has_data = true;
         }
@@ -127,17 +132,17 @@ void sensorLoop() {
         if(mag_desc.getLastUpdated()  > 0)
         {
             Serial.print("ICM20948 - Accel: ");
-            Serial.print(mag_desc.data.accelX, 4);
+            Serial.print(mag_desc.data.accel0, 4);
             Serial.print(", ");
-            Serial.print(mag_desc.data.accelY, 4);
+            Serial.print(mag_desc.data.accel1, 4);
             Serial.print(", ");
-            Serial.print(mag_desc.data.accelZ, 4);
+            Serial.print(mag_desc.data.accel2, 4);
             Serial.print(" | Gyro: ");
-            Serial.print(mag_desc.data.gyrX, 4);
+            Serial.print(mag_desc.data.gyr0, 4);
             Serial.print(", ");
-            Serial.print(mag_desc.data.gyrY, 4);
+            Serial.print(mag_desc.data.gyr1, 4);
             Serial.print(", ");
-            Serial.print(mag_desc.data.gyrZ, 4);
+            Serial.print(mag_desc.data.gyr2, 4);
             Serial.println();
             has_data = true;
         }

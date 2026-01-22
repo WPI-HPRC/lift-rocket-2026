@@ -36,7 +36,7 @@ StateID prelaunchLoop(StateData *data, Context *ctx) {
     const auto &accel_desc = ctx->accel.get_descriptor();
     if (accel_desc.getLastUpdated() != data->lastAccelReadingTime) {
         data->lastAccelReadingTime = accel_desc.getLastUpdated();
-        if(data->accelDebouncer.update(accel_desc.data.accelZ > LAUNCH_TRHESHOLD, millis())) {
+        if(data->accelDebouncer.update(accel_desc.data.accel0 > LAUNCH_TRHESHOLD, millis())) {
             return BOOST;
         }
     }

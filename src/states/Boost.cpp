@@ -26,7 +26,7 @@ StateID boostLoop (StateData* data, Context* ctx) {
     const auto &accel_desc = ctx->accel.get_descriptor();
     if (accel_desc.getLastUpdated() != data->lastAccelReadingTime && data->currentTime > 2000) {
         data->lastAccelReadingTime = accel_desc.getLastUpdated();
-        if(data->accelDebouncer.update(accel_desc.data.accelZ < COAST_THRESHOLD , millis())) {
+        if(data->accelDebouncer.update(accel_desc.data.accel0 < COAST_THRESHOLD , millis())) {
             return COAST;
         }
     }
