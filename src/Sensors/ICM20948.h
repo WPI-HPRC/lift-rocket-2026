@@ -11,9 +11,9 @@
 // is this the polling rate but named different
 
 struct ICMData {
-  float accelX, accelY, accelZ;
-  float gyrX, gyrY, gyrZ;
-  float magX, magY, magZ;
+  float accel0, accel1, accel2;
+  float gyr0, gyr1, gyr2;
+  float mag0, mag1, mag2;
 };
 
 class ICM20948 : public Sensor<ICM20948, ICMData> {
@@ -49,17 +49,17 @@ public:
     sensors_event_t accel, gyr, mag;
     icm.getEvent(&accel, &gyr, &mag);
 
-    out.accelX = accel.acceleration.x / g;
-    out.accelY = -accel.acceleration.y / g;
-    out.accelZ = accel.acceleration.z / g;
+    out.accel0 = accel.acceleration.x;
+    out.accel1 = accel.acceleration.y;
+    out.accel2 = accel.acceleration.z;
 
-    out.gyrX = gyr.gyro.x;
-    out.gyrY = -gyr.gyro.y;
-    out.gyrZ = gyr.gyro.z;
+    out.gyr0 = gyr.gyro.x;
+    out.gyr1 = -gyr.gyro.y;
+    out.gyr2 = gyr.gyro.z;
 
-    out.magX = mag.magnetic.x;
-    out.magY = mag.magnetic.y;
-    out.magZ = -mag.magnetic.z;
+    out.mag0 = mag.magnetic.x;
+    out.mag1 = mag.magnetic.y;
+    out.mag2 = mag.magnetic.z;
   }
 
 private:
