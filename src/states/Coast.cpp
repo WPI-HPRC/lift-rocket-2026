@@ -28,7 +28,7 @@ void coastInit (StateData* data) {
 StateID coastLoop (StateData* data, Context* ctx) {
     static bool airBrakesOut = false;
     static bool airBrakesDone = false;
-    static bool prevAltitude = 0;
+    static double prevAltitude = 0;
     long long now = millis();
     // These values may be used in the state code
     data->currentTime = now - data->startTime;
