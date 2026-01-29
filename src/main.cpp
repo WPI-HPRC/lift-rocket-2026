@@ -60,6 +60,22 @@ void sensorsSetup() {
     Serial.println("=== Starting main loop ===\n");
 }
 
+void initStateData(StateData *data) {
+    data->startTime = millis();
+    data->currentTime = 0;
+    data->deltaTime = 0;
+    data->lastLoopTime = 0;
+    data->loopCount = 0;
+};
+
+void updateStateData(StateData *data) {
+    long long now = millis();
+    data->currentTime = now - data->startTime;
+    data->deltaTime = now - data->lastLoopTime;
+    data->lastLoopTime = now;
+    data->loopCount++;
+}
+
 void sensorLoop() {
     static unsigned long last_print = 0;
     static int loop_count = 0;
@@ -225,21 +241,6 @@ void setup() {
     ctx.airBrakes.writeMicroseconds(SERVO_MIN);
 }
 
-void initStateData(StateData *data) {
-    data->startTime = millis();
-    data->currentTime = 0;
-    data->deltaTime = 0;
-    data->lastLoopTime = 0;
-    data->loopCount = 0;
-};
-
-void updateStateData(StateData *data) {
-    long long now = millis();
-    data->currentTime = now - data->startTime;
-    data->deltaTime = now - data->lastLoopTime;
-    data->lastLoopTime = now;
-    data->loopCount++;
-}
 
 void loop() {
 
