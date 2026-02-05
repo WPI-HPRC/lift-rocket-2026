@@ -33,6 +33,22 @@ StateData data;
 StateInitFunc initFuncs[NUM_STATES] = {};
 StateLoopFunc loopFuncs[NUM_STATES] = {};
 
+void initStateData(StateData *data) {
+    data->startTime = millis();
+    data->currentTime = 0;
+    data->deltaTime = 0;
+    data->lastLoopTime = 0;
+    data->loopCount = 0;
+};
+
+void updateStateData(StateData *data) {
+    long long now = millis();
+    data->currentTime = now - data->startTime;
+    data->deltaTime = now - data->lastLoopTime;
+    data->lastLoopTime = now;
+    data->loopCount++;
+}
+
 void sensorsSetup() {
     Serial.begin(115200);
     while(!Serial) {
@@ -223,22 +239,6 @@ void setup() {
 
     ctx.airBrakes.attach(SERVO_PIN);
     ctx.airBrakes.writeMicroseconds(SERVO_MIN);
-}
-
-void initStateData(StateData *data) {
-    data->startTime = millis();
-    data->currentTime = 0;
-    data->deltaTime = 0;
-    data->lastLoopTime = 0;
-    data->loopCount = 0;
-};
-
-void updateStateData(StateData *data) {
-    long long now = millis();
-    data->currentTime = now - data->startTime;
-    data->deltaTime = now - data->lastLoopTime;
-    data->lastLoopTime = now;
-    data->loopCount++;
 }
 
 void loop() {
