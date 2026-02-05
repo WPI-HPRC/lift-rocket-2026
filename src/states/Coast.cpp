@@ -16,25 +16,12 @@ double solveAltitude(double pressure) {
     return hb +
            (Tb / Lb) * (pow((pressure_Pa / pb), (-R * Lb / (g0 * M))) - 1);
 }
-void coastInit (StateData* data) {
-    // initialize altitude
-    data->startTime = millis();
-    data->currentTime = 0;
-    data->deltaTime = 0;
-    data->lastLoopTime = 0;
-    data->loopCount = 0;
-}
+void coastInit (StateData* data) { }
 
 StateID coastLoop (StateData* data, Context* ctx) {
     static bool airBrakesOut = false;
     static bool airBrakesDone = false;
-    static bool prevAltitude = 0;
-    long long now = millis();
-    // These values may be used in the state code
-    data->currentTime = now - data->startTime;
-    data->deltaTime = now - data->lastLoopTime;
-    data->lastLoopTime = now;
-    data->loopCount++;
+    static double prevAltitude = 0;
 
     /*
     - Poll acceleration data from ctx
@@ -57,7 +44,7 @@ StateID coastLoop (StateData* data, Context* ctx) {
     if (baro_desc.getLastUpdated() != data->lastBaroReadingTime) {
         data->lastBaroReadingTime = baro_desc.getLastUpdated();
         double currentAltitiude = solveAltitude(baro_desc.data.pressure);
-        if(data->accelDebouncer.update((currentAltitiude - prevAltitude) < 0 ,millis()) && airBrakesDone) {
+        if(data->baroDebouncer.update((currentAltitiude - prevAltitude) < 0 ,millis()) && airBrakesDone) {
             return DROGUE_DESCENT;
         }
         prevAltitude = currentAltitiude;

@@ -4,13 +4,7 @@
 #include "Arduino.h"
 #include "config.h"
 
-void prelaunchInit (StateData* data) {
-    data->startTime = millis();
-    data->currentTime = 0;
-    data->deltaTime = 0;
-    data->lastLoopTime = 0;
-    data->loopCount = 0;
-}
+void prelaunchInit (StateData* data) { }
 
 StateID prelaunchLoop(StateData *data, Context *ctx) {
     //Serial.println("looping prelaunch");
@@ -19,13 +13,6 @@ StateID prelaunchLoop(StateData *data, Context *ctx) {
     static bool GreenLedState = false;
     static uint32_t lastBlueToggleTime = 0;
     static uint32_t lastGreenToggleTime = 0;
-
-    long long now = millis();
-    // These values may be used in the state code
-    data->currentTime = now - data->startTime;
-    data->deltaTime = now - data->lastLoopTime;
-    data->lastLoopTime = now;
-    data->loopCount++;
 
     /*
     - Poll acceleration data from ctx

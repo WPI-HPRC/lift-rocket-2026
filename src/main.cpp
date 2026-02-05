@@ -216,6 +216,7 @@ void setup() {
 
     
     // NOTE: Run initialization on the first state
+    initStateData(&data);
     (*initFuncs[currentState])(&data);
     sensorsSetup();
     ctx.sdInitialized = initializeLogging(&ctx);
@@ -224,10 +225,29 @@ void setup() {
     ctx.airBrakes.writeMicroseconds(SERVO_MIN);
 }
 
+void initStateData(StateData *data) {
+    data->startTime = millis();
+    data->currentTime = 0;
+    data->deltaTime = 0;
+    data->lastLoopTime = 0;
+    data->loopCount = 0;
+};
+
+void updateStateData(StateData *data) {
+    long long now = millis();
+    data->currentTime = now - data->startTime;
+    data->deltaTime = now - data->lastLoopTime;
+    data->lastLoopTime = now;
+    data->loopCount++;
+}
+
 void loop() {
+
+    updateStateData(&data);
     StateID newState = (*loopFuncs[currentState])(&data, &ctx);
 
     if(currentState != newState) {
+        initStateData(&data);
         (*initFuncs[newState])(&data);
         currentState = newState;
         ctx.errorLogFile.printf("%d %d\n", newState, millis());

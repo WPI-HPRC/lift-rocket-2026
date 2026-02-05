@@ -3,5 +3,6 @@
 void drogueDescentInit(StateData *data) {}
 
 StateID drogueDescentLoop (StateData* data, Context* ctx) {
-    return DROGUE_DESCENT;
+
+    return MAIN_DESCENT;
 }
