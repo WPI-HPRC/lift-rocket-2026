@@ -10,8 +10,8 @@
 //#include "Sensors/MAX10S.h"
 //#include "Sensors/INA219.h"
 #include "config.h"
-
 #include "logging.h"
+#include "CanardsServo.h"
 
 Context ctx;
 
@@ -196,7 +196,7 @@ void sensorLoop() {
         }
 
         if (!has_data)
-        {
+{
             Serial.println("No sensor data received yet...");
         }
 
@@ -239,6 +239,8 @@ void setup() {
 
     ctx.airBrakes.attach(SERVO_PIN);
     ctx.airBrakes.writeMicroseconds(SERVO_MIN);
+
+    canardsSetup(&ctx);
 }
 
 
@@ -253,6 +255,8 @@ void loop() {
         currentState = newState;
         ctx.errorLogFile.printf("%d %d\n", newState, millis());
     }
+
+    canardsLoop(&ctx);
 
     sensorLoop();
     loggingLoop(&ctx);

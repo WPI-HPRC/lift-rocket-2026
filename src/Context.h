@@ -8,7 +8,7 @@
 #include "Sensors/MAX10S.h"
 #include "Servo.h"
 #include "SensorManager/SensorBase.h"
-#inlcude "CanardServo.h"
+#include "CanardServoTypes.h"
 
 struct ASM330Data;
 struct LPS22Data;
@@ -29,5 +29,8 @@ struct Context {
     INA219 curr;
     
     Servo airBrakes;
-    CanardServo canard0;
+    CanardServo canard1;
+    CanardServo canard2;
+    CanardServo canard3;
+    CanardServo canard4;
 };

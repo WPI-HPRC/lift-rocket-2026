@@ -1,11 +1,9 @@
-#include <Servo.h>
+#pragma once
 
-struct CanardServo {
-    Servo servo;
-    double setpoint;
-    double Kp;
-    double Ki;
-    double Kd;
-};
+#include "Context.h"
+#include "CanardServoTypes.h"
 
+void canardsSetup(Context *ctx);
+void canardsLoop(Context *ctx);
 
+void servoSetpoint(CanardServo *servo, double setpoint);

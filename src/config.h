@@ -38,6 +38,20 @@
     #define BLUE_LED_PIN PG15
     #define RED_LED_PIN PB8
     #define GREEN_LED_PIN PB9
+
+    // TODO: add the other three pins for the canards
+    #define CANARD_1_PIN 0 // TODO: Change this to real pin
+    #define CANARD_1_FEEDBACK_PIN 0 // TODO: Change this to real pin
+
+    #define CANARD_2_PIN 0 // TODO: Change this to real pin
+    #define CANARD_2_FEEDBACK_PIN 0 // TODO: Change this to real pin
+    
+    #define CANARD_3_PIN 0 // TODO: Change this to real pin
+    #define CANARD_3_FEEDBACK_PIN 0 // TODO: Change this to real pin
+
+    #define CANARD_4_PIN 0 // TODO: Change this to real pin
+    #define CANARD_4_FEEDBACK_PIN 0 // TODO: Change this to real pin
+
 #elif defined(POLARIS)
     #include "boilerplate/Sensors/Impl/MAX10S.h"
     #include "boilerplate/Sensors/Impl/Polaris/ICM42688.h"
