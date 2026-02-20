@@ -43,7 +43,7 @@ bool initializeLogging(Context *ctx) {
     {
         // NOTE: SD initialization failed
         // Do something about that probably
-        Serial.println("FAILED");
+        Serial.println("FAILEDSD");
         return false;
     }
 }

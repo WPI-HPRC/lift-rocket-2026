@@ -51,24 +51,30 @@ void updateStateData(StateData *data) {
 
 void sensorsSetup() {
     Serial.begin(115200);
-    while(!Serial) {
+    while(!Serial.available()) {
         delay(10);
     }
 
     Serial.println("Starting MARS board initialization...");
 
-    Wire.setSDA(SENSOR_SDA);
-    Wire.setSCL(SENSOR_SCL);
-    Wire.begin();
+    // Wire.setSDA(SENSOR_SDA);
+    // Wire.setSCL(SENSOR_SCL);
+    // Wire.begin();
 
-    Serial.print("I2C initialized on SDA: ");
-    Serial.print(SENSOR_SDA);
-    Serial.print(", SCL: ");
-    Serial.println(SENSOR_SCL);
+    SPI.setMISO(PG_9);
+    SPI.setMOSI(PD_7);
+    SPI.setSCLK(PG_11);
+
+    SPI.begin();
+
+    // Serial.print("I2C initialized on SDA: ");
+    // Serial.print(SENSOR_SDA);
+    // Serial.print(", SCL: ");
+    // Serial.println(SENSOR_SCL);
 
     mgr.sensorInit();
 
-    Wire.setClock(400000);
+    // Wire.setClock(400000);
 
     Serial.println("\n=== Sensor Initialization Summary ===");
     Serial.print("Total sensors: ");
