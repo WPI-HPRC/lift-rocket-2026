@@ -66,6 +66,10 @@ BLA::Matrix<19, 19> StateEstimator::getP() {
     return P;
 }
 
+BLA::Matrix<19, 1> StateEstimator::getPDiag() {
+    return QuaternionUtils::extractDiag(getP());
+}
+
 BLA::Matrix<3, 1> StateEstimator::get_gyro_prev() {
     return gyro_prev;
 }
