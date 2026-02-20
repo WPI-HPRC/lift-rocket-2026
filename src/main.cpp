@@ -241,10 +241,88 @@ void setup() {
     initStateData(&data);
     (*initFuncs[currentState])(&data);
     sensorsSetup();
+    ctx.ekfLooping = false;
     ctx.sdInitialized = initializeLogging(&ctx);
 
     ctx.airBrakes.attach(SERVO_PIN);
     ctx.airBrakes.writeMicroseconds(SERVO_MIN);
+
+    ctx.estimator = StateEstimator();
+    
+    BLA::Matrix<3, 1> ecef = {0, 0, 0};
+    ctx.estimator.init(ecef, millis());
+}
+
+void ekfLoop(Context *ctx) {
+    static uint32_t last_accel_time = 0;
+    static uint32_t last_mag_time = 0;
+    static uint32_t last_gps_time = 0;
+    static uint32_t last_baro_time = 0;
+
+    uint32_t now = millis();
+
+    const auto &accel_desc = ctx->accel.get_descriptor();
+    const auto &baro_desc = ctx->baro.get_descriptor();
+    const auto &mag_desc = ctx->mag.get_descriptor();
+    const auto &gps_desc = ctx->gps.get_descriptor();
+
+    bool inAir = currentState == BOOST ||
+                 currentState == COAST ||
+                 currentState == DROGUE_DESCENT ||
+                 currentState == MAIN_DESCENT;
+
+    // Accel and gyro becuase they are on the same sensor
+    if(accel_desc.getLastUpdated() > last_accel_time) {
+        BLA::Matrix<3, 1> gyro = {accel_desc.data.gyr0, accel_desc.data.gyr1, accel_desc.data.gyr2};
+        ctx->estimator.fastGyroProp(gyro, now);
+
+        BLA::Matrix<3, 1> accel = {accel_desc.data.accel0, accel_desc.data.accel1, accel_desc.data.accel2};
+        ctx->estimator.fastAccelProp(accel, now);
+    }
+
+    if(inAir) {
+        if(baro_desc.getLastUpdated() > last_baro_time ||
+           mag_desc.getLastUpdated() > last_mag_time ||
+           gps_desc.getLastUpdated() > last_gps_time) {
+            ctx->estimator.ekfPredict(now); 
+        }
+    } else {
+        if(accel_desc.getLastUpdated() > last_accel_time ||
+           baro_desc.getLastUpdated() > last_baro_time ||
+           mag_desc.getLastUpdated() > last_mag_time ||
+           gps_desc.getLastUpdated() > last_gps_time) {
+            ctx->estimator.ekfPredict(now); 
+        }
+    }
+
+    if(accel_desc.getLastUpdated() > last_accel_time) {
+        last_accel_time = accel_desc.getLastUpdated();
+        BLA::Matrix<3, 1> accel = {accel_desc.data.accel0, accel_desc.data.accel1, accel_desc.data.accel2};
+        ctx->estimator.runAccelUpdate(accel, now);
+    }
+
+    if (baro_desc.getLastUpdated() > last_baro_time)
+    {
+        last_baro_time = baro_desc.getLastUpdated();
+        BLA::Matrix<1, 1> baro = {baro_desc.data.pressure};
+        ctx->estimator.runBaroUpdate(baro, now);
+        ctx->estimator.setTemp(baro_desc.data.temp);
+    }
+
+    if (mag_desc.getLastUpdated() > last_mag_time)
+    {
+        last_mag_time = mag_desc.getLastUpdated();
+        BLA::Matrix<3, 1> mag = {mag_desc.data.mag0, mag_desc.data.mag1, mag_desc.data.mag2};
+        ctx->estimator.runMagUpdate(mag, now);
+    }
+
+    if (gps_desc.getLastUpdated() > last_gps_time)
+    {
+        last_gps_time = gps_desc.getLastUpdated();
+        BLA::Matrix<3, 1> gpsPos = {gps_desc.data.ecefX, gps_desc.data.ecefY, gps_desc.data.ecefZ};
+        BLA::Matrix<3, 1> gpsVel = {gps_desc.data.velN, gps_desc.data.velE, gps_desc.data.velD};
+        ctx->estimator.runGPSUpdate(gpsPos, gpsVel, false, now);
+    }
 }
 
 void loop() {
@@ -260,5 +338,10 @@ void loop() {
     }
 
     sensorLoop();
+
+    if(ctx.ekfLooping) {
+        ekfLoop(&ctx);
+    }
+
     loggingLoop(&ctx);
 }
