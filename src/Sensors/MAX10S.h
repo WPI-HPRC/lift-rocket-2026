@@ -6,8 +6,9 @@
 #include <SparkFun_u-blox_GNSS_v3.h>
 
 struct MAX10SData {
-    float lat;
-    float lon;
+    float ecefX;
+    float ecefY;
+    float ecefZ;
     float altMSL;
     float altEllipsoid;
     int32_t velN;
@@ -43,8 +44,9 @@ public:
 
     void poll_impl(uint32_t now_ms,  MAX10SData &out) {
         out.gpsLockType = GPS.getFixType();
-        out.lat = (float)GPS.getLatitude() / 1e7;
-        out.lon = (float)GPS.getLongitude() / 1e7;
+        out.ecefX = (float) myGNSS.getHighResECEFX() * 0.01f;
+        out.ecefY = (float) myGNSS.getHighResECEFY() * 0.01f;
+        out.ecefZ = (float) myGNSS.getHighResECEFZ() * 0.01f;
         out.altMSL = (float) GPS.getAltitudeMSL() / 1000.0;
         out.altEllipsoid = (float) GPS.getAltitude() / 1000.0;
         out.velN = GPS.getNedNorthVel();
