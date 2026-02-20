@@ -1,3 +1,6 @@
 [submodule "src/boilerplate"]
 	path = src/boilerplate
 	url = https://github.com/WPI-HPRC/boilerplate.git
+[submodule "src/Ebyte-E22"]
+	path = src/Ebyte-E22
+	url = https://github.com/WPI-HPRC/Ebyte-E22.git
