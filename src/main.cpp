@@ -159,6 +159,12 @@ void sensorLoop() {
             Serial.print(mag_desc.data.gyr1, 4);
             Serial.print(", ");
             Serial.print(mag_desc.data.gyr2, 4);
+            Serial.print(" | Mag: ");
+            Serial.print(mag_desc.data.mag0, 4);
+            Serial.print(", ");
+            Serial.print(mag_desc.data.mag1, 4);
+            Serial.print(", ");
+            Serial.print(mag_desc.data.mag2, 4);
             Serial.println();
             has_data = true;
         }
