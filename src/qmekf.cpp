@@ -82,6 +82,10 @@ BLA::Matrix<3, 1> StateEstimator::get_vel_prev() {
     return vel_prev;
 }
 
+BLA::Matrix<3, 1> StateEstimator::get_vel_prev_ned() {
+    return launch_dcmned2ecef * get_vel_prev();
+}
+
 BLA::Matrix<3, 1> StateEstimator::get_pos_prev() {
     return pos_prev;
 }

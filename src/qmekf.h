@@ -72,6 +72,7 @@ class StateEstimator {
     BLA::Matrix<3, 1> get_gyro_prev();
     BLA::Matrix<3, 1> get_accel_prev();
     BLA::Matrix<3,1> get_vel_prev();
+    BLA::Matrix<3, 1> get_vel_prev_ned();
     BLA::Matrix<3,1> get_pos_prev();
     BLA::Matrix<3,1> get_mag_prev();
     BLA::Matrix<1,1> get_baro_prev();
