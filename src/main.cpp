@@ -80,8 +80,6 @@ void sensorLoop() {
     static unsigned long last_print = 0;
     static int loop_count = 0;
 
-    Serial.println("BEFORE BEFORE MANAGER LOOP");
-    Serial.println("BEFORE MANAGER LOOP");
     // Update all sensors through manager
     mgr->loop();
 
@@ -90,7 +88,6 @@ void sensorLoop() {
         return;
     }
     */
-    Serial.println("AFTER MANAGER LOOP");
     // manager is not being used here to get data
     if (millis() - last_print > 200)
     {
@@ -206,7 +203,6 @@ void sensorLoop() {
 
         Serial.println("======================");
     }
-    Serial.println("BEFORE PRINTING");
 }
 
 void setup() {
