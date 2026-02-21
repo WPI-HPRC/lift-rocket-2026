@@ -1,8 +1,8 @@
 #pragma once
 
-constexpr float LAUNCH_TRHESHOLD = 5;
+constexpr float LAUNCH_TRHESHOLD = -5; // in ned frame vertical dir is negative
 
-constexpr float COAST_THRESHOLD = 0.3f;
+constexpr float COAST_THRESHOLD = -0.3f; // in ned frame vertical dir is negative
 
 constexpr float BOOST_TIMEOUT = 0.0f;
 

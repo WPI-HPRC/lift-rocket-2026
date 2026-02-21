@@ -43,11 +43,17 @@ StateID prelaunchLoop(StateData *data, Context *ctx) {
     - Check if need to abort
     - Update sensor data and ctx for next iteration?
     */
-    if (accel_desc.getLastUpdated() != data->lastAccelReadingTime) {
-        data->lastAccelReadingTime = accel_desc.getLastUpdated();
-        if(data->accelDebouncer.update(accel_desc.data.accel0 > LAUNCH_TRHESHOLD, millis())) {
-            return BOOST;
-        }
+//    if (accel_desc.getLastUpdated() != data->lastAccelReadingTime) {
+//        data->lastAccelReadingTime = accel_desc.getLastUpdated();
+//        if(data->accelDebouncer.update(accel_desc.data.accel0 > LAUNCH_TRHESHOLD, millis())) {
+//            return BOOST;
+//        }
+//    }
+
+    const auto acc_vec = ctx->estimator.get_acc_prev_ned();
+    // check acceleration in vertical direction is greater than threshold
+    if(acc_vec(2, 0) > LAUNCH_TRHESHOLD) {
+        return BOOST;
     }
 
     if(ctx->sdInitialized && ctx->logFile != NULL)  {
