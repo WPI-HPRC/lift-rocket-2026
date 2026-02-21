@@ -4,11 +4,6 @@
 #include "States.h"
 
 #include "SensorManager/SensorManager.h"
-//#include "Sensors/LSP22.h"
-//#include "Sensors/ASM330.h"
-//#include "Sensors/ICM20948.h"
-//#include "Sensors/MAX10S.h"
-//#include "Sensors/INA219.h"
 #include "config.h"
 
 #include "logging.h"
@@ -108,6 +103,7 @@ void sensorLoop() {
 
         bool has_data = false;
         // Print ASM330 data
+        /*
         if (accel_desc.getLastUpdated() > 0)
         {
             Serial.print("ASM330 - Accel: ");
@@ -207,6 +203,7 @@ void sensorLoop() {
         }
 
         Serial.println("======================");
+        */
     }
 }
 

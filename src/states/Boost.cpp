@@ -1,5 +1,6 @@
 #include "../State.h"
 #include "StateMachineConstants.h"
+#include "../qmekf.h"
 
 void boostInit (StateData* data) {}
 
@@ -11,12 +12,13 @@ StateID boostLoop (StateData* data, Context* ctx) {
     - Check if need to abort
     - Update sensor data and ctx for next iteration?
     */
-    const auto &accel_desc = ctx->accel.get_descriptor();
-    if (accel_desc.getLastUpdated() != data->lastAccelReadingTime && data->currentTime > 2000) {
-        data->lastAccelReadingTime = accel_desc.getLastUpdated();
-        if(data->accelDebouncer.update(accel_desc.data.accel0 < COAST_THRESHOLD , millis())) {
-            return COAST;
-        }
+    //const auto &accel_desc = ctx->accel.get_descriptor();
+    //StateEstimator state_estimator = ctx->estimator;
+    const auto acc_vec = ctx->estimator.get_accel_prev_ned();
+    if (acc_vec(2, 0) < COAST_THRESHOLD && data->currentTime > 2000) {
+        // check that acceleration up in NED is less than threshold, and
+        // current time > 2000
+        return COAST;
     }
 
     return BOOST;
