@@ -1,3 +1,6 @@
 [submodule "src/boilerplate"]
 	path = src/boilerplate
 	url = https://github.com/WPI-HPRC/boilerplate.git
+[submodule "src/LoRaE22"]
+	path = src/LoRaE22
+	url = https://github.com/WPI-HPRC/LoRaE22.git
