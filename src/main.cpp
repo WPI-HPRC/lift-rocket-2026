@@ -16,18 +16,16 @@
 
 SPIClass dev_spi(SPI_MOSI, SPI_MISO, SPI_SCLK);
 
-Context ctx(&dev_spi);
+Context *ctx;
+
+using MillisFn = uint32_t (*)();   // or unsigned long (*)() depending on your millis
+constexpr size_t N = 4;
+
+using MgrT = SensorManager<MillisFn, N>;
+
+MgrT* mgr = nullptr;   // declare now
 
 uint32_t millisSource() { return millis(); }
-
-Sensor* sensor_list[] = {
-    &ctx.accel,
-    &ctx.baro,
-    &ctx.mag,
-    &ctx.gps,
-};
-
-SensorManager mgr(sensor_list, millisSource);
 
 StateID currentState;
 StateData data;
@@ -52,13 +50,9 @@ void updateStateData(StateData *data) {
 }
 
 void sensorsSetup() {
-    Serial.begin(115200);
-    while(!Serial) {
-        delay(10);
-    }
-
     Serial.println("Starting MARS board initialization...");
 
+    /*
     Wire.setSDA(SENSOR_SDA);
     Wire.setSCL(SENSOR_SCL);
     Wire.begin();
@@ -67,14 +61,15 @@ void sensorsSetup() {
     Serial.print(SENSOR_SDA);
     Serial.print(", SCL: ");
     Serial.println(SENSOR_SCL);
+    */
 
-    mgr.sensorInit();
+    mgr->sensorInit();
 
     Wire.setClock(400000);
 
     Serial.println("\n=== Sensor Initialization Summary ===");
     Serial.print("Total sensors: ");
-    Serial.println(mgr.count);
+    Serial.println(mgr->count);
     Serial.println("=== Starting main loop ===\n");
 }
 
@@ -83,7 +78,7 @@ void sensorLoop() {
     static int loop_count = 0;
 
     // Update all sensors through manager
-    mgr.loop();
+    mgr->loop();
 
     /*
     if (currentState >= PRELAUNCH) {
@@ -102,11 +97,11 @@ void sensorLoop() {
         Serial.println(" ===");
 
         // DIRECT ACCESS to sensor data - this is guaranteed to work
-        auto &accel_desc = ctx.accel;
-        auto &baro_desc = ctx.baro;
-        auto &mag_desc = ctx.mag;
-        auto &gps_desc = ctx.gps;
-        // auto &curr_desc = ctx.curr;
+        auto &accel_desc = ctx->accel;
+        auto &baro_desc = ctx->baro;
+        auto &mag_desc = ctx->mag;
+        auto &gps_desc = ctx->gps;
+        // auto &curr_desc = ctx->curr;
 
         bool has_data = false;
         // Print ASM330 data
@@ -203,6 +198,24 @@ void sensorLoop() {
 }
 
 void setup() {
+
+    Serial.begin(115200);
+    while(!Serial.available()) {
+        delay(10);
+    }
+
+    ctx = new Context(&dev_spi);
+
+    Sensor* sensor_list[] = {
+        &ctx->accel,
+        &ctx->baro,
+        &ctx->mag,
+        &ctx->gps,
+    };
+
+    MgrT mgr_storage(sensor_list, millisSource);
+    mgr = &mgr_storage;
+
     currentState = PRELAUNCH;
     data = {};
 
@@ -239,24 +252,26 @@ void setup() {
     initStateData(&data);
     (*initFuncs[currentState])(&data);
     sensorsSetup();
-    ctx.sdInitialized = initializeLogging(&ctx);
+    // ctx->sdInitialized = initializeLogging(ctx);
 
-    ctx.airBrakes.attach(SERVO_PIN);
-    ctx.airBrakes.writeMicroseconds(SERVO_MIN);
+    /*
+    ctx->airBrakes.attach(SERVO_PIN);
+    ctx->airBrakes.writeMicroseconds(SERVO_MIN);
+    */
 }
 
 void loop() {
 
     updateStateData(&data);
-    StateID newState = (*loopFuncs[currentState])(&data, &ctx);
+    StateID newState = (*loopFuncs[currentState])(&data, ctx);
 
     if(currentState != newState) {
         initStateData(&data);
         (*initFuncs[newState])(&data);
         currentState = newState;
-        ctx.errorLogFile.printf("%d %d\n", newState, millis());
+        ctx->errorLogFile.printf("%d %d\n", newState, millis());
     }
 
     sensorLoop();
-    loggingLoop(&ctx);
+    loggingLoop(ctx);
 }
