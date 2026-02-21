@@ -3,6 +3,10 @@
 #include "State.h"
 #include "States.h"
 
+#include "LoRaE22/LoRaE22.h"
+#include "LoRaE22/RadioConfigDatatypes.h"
+#include "RadioConfig.h"
+
 #include "boilerplate/Sensors/SensorManager/SensorManager.h"
 //#include "Sensors/LSP22.h"
 //#include "Sensors/ASM330.h"
@@ -12,6 +16,52 @@
 #include "config.h"
 
 #include "logging.h"
+
+const char* callsign = "KV0R";
+HardwareSerial radioSerial(PB_11, PB_10);
+LoRaE22 radioModule(&radioSerial, PB_2, PF_12, PF_11, callsign);
+// Implement this per your platform, then pass a callback to it in setup().
+// This is a STM32 SPECIFIC implementation.
+bool changeSerialPortConfig(RadioConfigTypes::SerialSpeeds baudRate, RadioConfigTypes::ParityConfig parity){
+  // this is safe to call even when the port is not open.
+  radioSerial.end();
+
+  uint32_t baud = 0;
+  uint16_t parityConfig = 0;
+  
+  // the radio's baud rates don't follow any pattern over the entire range, so ugly switch statement it is
+  switch(baudRate){
+    case RadioConfigTypes::SerialSpeeds::BAUD_1200:
+      baud = 1200; break;
+    case RadioConfigTypes::SerialSpeeds::BAUD_2400:
+      baud = 2400; break;
+    case RadioConfigTypes::SerialSpeeds::BAUD_4800:
+      baud = 4800; break;
+    case RadioConfigTypes::SerialSpeeds::BAUD_9600:
+      baud = 9600; break;
+    case RadioConfigTypes::SerialSpeeds::BAUD_19200:
+      baud = 19200; break;
+    case RadioConfigTypes::SerialSpeeds::BAUD_38400:
+      baud = 38400; break;
+    case RadioConfigTypes::SerialSpeeds::BAUD_57600:
+      baud = 57600; break;
+    case RadioConfigTypes::SerialSpeeds::BAUD_115200:
+      baud = 115200; break;
+  };
+  // this is just easier
+  switch(parity){
+    case RadioConfigTypes::ParityConfig::Parity_8N1:
+      parityConfig = SERIAL_8N1; break;
+    case RadioConfigTypes::ParityConfig::Parity_8E1:
+      parityConfig = SERIAL_8E1; break;
+    case RadioConfigTypes::ParityConfig::Parity_8O1:
+      parityConfig = SERIAL_8O1; break;
+  };
+  
+  radioSerial.begin(baud, parityConfig);
+
+  return true;
+};
 
 Context ctx;
 
@@ -51,11 +101,19 @@ void updateStateData(StateData *data) {
 
 void sensorsSetup() {
     Serial.begin(115200);
-    while(!Serial) {
+    while(!Serial.available()) {
         delay(10);
     }
 
     Serial.println("Starting MARS board initialization...");
+
+    // init radio
+    radioModule.setConfig(radioConfig);
+    radioModule.setFrequency(radioConfig.frequency/1000.0);
+    radioModule.changeSerialPortCallback(changeSerialPortConfig);
+    int8_t radioCode = radioModule.init(0);
+
+    Serial.println("Radio Module initiated with code: " + String(radioCode));
 
     Wire.setSDA(SENSOR_SDA);
     Wire.setSCL(SENSOR_SCL);
@@ -255,4 +313,12 @@ void loop() {
 
     sensorLoop();
     loggingLoop(&ctx);
+
+    
+
+    radioModule.sendByte('E');
+    radioModule.sendByte('X');
+    radioModule.sendByte('P');
+    
+    radioModule.update();
 }
