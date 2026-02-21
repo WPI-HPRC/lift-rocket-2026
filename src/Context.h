@@ -8,7 +8,7 @@
 #include "Sensors/MAX10S.h"
 #include "Servo.h"
 #include "SensorManager/SensorBase.h"
-#include "qmekf.h"
+#include "qmekf-lib/qmekf.h"
 
 struct ASM330Data;
 struct LPS22Data;
