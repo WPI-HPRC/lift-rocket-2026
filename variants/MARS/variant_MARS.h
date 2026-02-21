@@ -11,7 +11,7 @@
  *******************************************************************************
  */
 #pragma once
-
+// #include "pins_arduino.h"
 /*----------------------------------------------------------------------------
  *        STM32 pins number
  *----------------------------------------------------------------------------*/
@@ -193,6 +193,9 @@
 #define PC11_ALT1               (PC11 | ALT1)
 #define PF8_ALT1                (PF8  | ALT1)
 #define PF9_ALT1                (PF9  | ALT1)
+#define PD9_ALT0                (PD9  | ALT0)
+#define PD10_ALT0               (PD10 | ALT0)
+#define PD11_ALT0               (PD11 | ALT0)
 
 #define NUM_DIGITAL_PINS        119
 #define NUM_DUALPAD_PINS        2
@@ -202,13 +205,24 @@
 #ifndef LED_BUILTIN
   #define LED_BUILTIN           PB0  // LD1
 #endif
-#define LED_GREEN               LED_BUILTIN
-#define LED_BLUE                PB7  // LD2
-#define LED_RED                 PB14 // LD3
+#define LED_GREEN               PD10_ALT0
+#define LED_BLUE                PD11_ALT0  // LD2
+#define LED_RED                 PD9_ALT0 // LD3
 
 // On-board user button
 #ifndef USER_BTN
   #define USER_BTN              PC13
+#endif
+
+// SPI defs
+#ifndef PIN_SPI_MOSI
+  #define PIN_SPI_MOSI          PD7
+#endif
+#ifndef PIN_SPI_MISO
+  #define PIN_SPI_MISO          PG9
+#endif
+#ifndef PIN_SPI_SCK
+  #define PIN_SPI_SCK           PG11
 #endif
 
 // Timer Definitions
