@@ -20,10 +20,10 @@ StateID prelaunchLoop(StateData *data, Context *ctx) {
     - Check if need to abort
     - Update sensor data and ctx for next iteration?
     */
-    const auto &accel_desc = ctx->accel.get_descriptor();
-    if (accel_desc.getLastUpdated() != data->lastAccelReadingTime) {
-        data->lastAccelReadingTime = accel_desc.getLastUpdated();
-        if(data->accelDebouncer.update(accel_desc.data.accel0 > LAUNCH_TRHESHOLD, millis())) {
+    auto &accel_desc = ctx->accel;
+    if (accel_desc.dataUpdatedAt() != data->lastAccelReadingTime) {
+        data->lastAccelReadingTime = accel_desc.dataUpdatedAt();
+        if(data->accelDebouncer.update(accel_desc.getData()->accelX > LAUNCH_TRHESHOLD, millis())) {
             return BOOST;
         }
     }
@@ -37,6 +37,7 @@ StateID prelaunchLoop(StateData *data, Context *ctx) {
         }
     }
 
+    /*
     const auto &gps_desc = ctx->gps.get_descriptor();
 
     if(gps_desc.data.gpsLockType == 3) {
@@ -46,6 +47,7 @@ StateID prelaunchLoop(StateData *data, Context *ctx) {
             digitalWrite(GREEN_LED_PIN, GreenLedState);
         }
     }
+        */
 
 
     return PRELAUNCH;

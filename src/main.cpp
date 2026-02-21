@@ -4,28 +4,30 @@
 #include "States.h"
 
 #include "boilerplate/Sensors/SensorManager/SensorManager.h"
-//#include "Sensors/LSP22.h"
-//#include "Sensors/ASM330.h"
-//#include "Sensors/ICM20948.h"
-//#include "Sensors/MAX10S.h"
-//#include "Sensors/INA219.h"
 #include "config.h"
 
 #include "logging.h"
 
-Context ctx;
+#define SPI_MOSI PD_7
+#define SPI_MISO PG_9
+#define SPI_SCLK PG_11
+
+#define ASM_INT_1 PF4_ALT0
+
+SPIClass dev_spi(SPI_MOSI, SPI_MISO, SPI_SCLK);
+
+Context ctx(&dev_spi);
 
 uint32_t millisSource() { return millis(); }
 
-SensorManager mgr {
-    millisSource,
-    ctx.accel,
-    ctx.baro,
-    ctx.mag,
-    ctx.gps,
-    ctx.curr,
+Sensor* sensor_list[] = {
+    &ctx.accel,
+    &ctx.baro,
+    &ctx.mag,
+    &ctx.gps,
 };
 
+SensorManager mgr(sensor_list, millisSource);
 
 StateID currentState;
 StateData data;
@@ -72,7 +74,7 @@ void sensorsSetup() {
 
     Serial.println("\n=== Sensor Initialization Summary ===");
     Serial.print("Total sensors: ");
-    Serial.println(mgr.count());
+    Serial.println(mgr.count);
     Serial.println("=== Starting main loop ===\n");
 }
 
@@ -100,28 +102,28 @@ void sensorLoop() {
         Serial.println(" ===");
 
         // DIRECT ACCESS to sensor data - this is guaranteed to work
-        const auto &accel_desc = ctx.accel.get_descriptor();
-        const auto &baro_desc = ctx.baro.get_descriptor();
-        const auto &mag_desc = ctx.mag.get_descriptor();
-        const auto &gps_desc = ctx.gps.get_descriptor();
-        const auto &curr_desc = ctx.curr.get_descriptor();
+        auto &accel_desc = ctx.accel;
+        auto &baro_desc = ctx.baro;
+        auto &mag_desc = ctx.mag;
+        auto &gps_desc = ctx.gps;
+        // auto &curr_desc = ctx.curr;
 
         bool has_data = false;
         // Print ASM330 data
-        if (accel_desc.getLastUpdated() > 0)
+        if (accel_desc.dataUpdatedAt() > 0)
         {
             Serial.print("ASM330 - Accel: ");
-            Serial.print(accel_desc.data.accel0, 4);
+            Serial.print(accel_desc.getData()->accelX, 4);
             Serial.print(", ");
-            Serial.print(accel_desc.data.accel1, 4);
+            Serial.print(accel_desc.getData()->accelY, 4);
             Serial.print(", ");
-            Serial.print(accel_desc.data.accel2, 4);
+            Serial.print(accel_desc.getData()->accelZ, 4);
             Serial.print(" | Gyro: ");
-            Serial.print(accel_desc.data.gyr0, 4);
+            Serial.print(accel_desc.getData()->gyrX, 4);
             Serial.print(", ");
-            Serial.print(accel_desc.data.gyr1, 4);
+            Serial.print(accel_desc.getData()->gyrY, 4);
             Serial.print(", ");
-            Serial.print(accel_desc.data.gyr2, 4);
+            Serial.print(accel_desc.getData()->gyrZ, 4);
             Serial.println();
             has_data = true;
         }
@@ -131,12 +133,12 @@ void sensorLoop() {
         }
 
         // Print LPS22 data
-        if (baro_desc.getLastUpdated() > 0)
+        if (baro_desc.dataUpdatedAt() > 0)
         {
             Serial.print("LPS22 - Pressure: ");
-            Serial.print(baro_desc.data.pressure, 4);
+            Serial.print(baro_desc.getData()->pressure, 4);
             Serial.print(" hPa, Temp: ");
-            Serial.print(baro_desc.data.temp, 4);
+            Serial.print(baro_desc.getData()->temperature, 4);
             Serial.println(" C");
             has_data = true;
         }
@@ -145,20 +147,21 @@ void sensorLoop() {
             Serial.println("LPS22: No data (timestamp = 0)");
         }
 
+        /*
         if(mag_desc.getLastUpdated()  > 0)
         {
             Serial.print("ICM20948 - Accel: ");
-            Serial.print(mag_desc.data.accel0, 4);
+            Serial.print(mag_desc.getData().accel0, 4);
             Serial.print(", ");
-            Serial.print(mag_desc.data.accel1, 4);
+            Serial.print(mag_desc.getData().accel1, 4);
             Serial.print(", ");
-            Serial.print(mag_desc.data.accel2, 4);
+            Serial.print(mag_desc.getData().accel2, 4);
             Serial.print(" | Gyro: ");
-            Serial.print(mag_desc.data.gyr0, 4);
+            Serial.print(mag_desc.getData().gyr0, 4);
             Serial.print(", ");
-            Serial.print(mag_desc.data.gyr1, 4);
+            Serial.print(mag_desc.getData().gyr1, 4);
             Serial.print(", ");
-            Serial.print(mag_desc.data.gyr2, 4);
+            Serial.print(mag_desc.getData().gyr2, 4);
             Serial.println();
             has_data = true;
         }
@@ -166,19 +169,21 @@ void sensorLoop() {
         {
             Serial.println("ICM20948: No data (timestamp = 0)");
         }
+            */
 
+        /*
         if(gps_desc.getLastUpdated() > 0)
         {
             Serial.print("MAX10S - Lat, Lon, AltMSL, AltElipsoid: ");
-            Serial.print(gps_desc.data.lat, 4);
+            Serial.print(gps_desc.getData().lat, 4);
             Serial.print(", ");
-            Serial.print(gps_desc.data.lon, 4);
+            Serial.print(gps_desc.getData().lon, 4);
             Serial.print(", ");
-            Serial.print(gps_desc.data.altMSL, 4);
+            Serial.print(gps_desc.getData().altMSL, 4);
             Serial.print(", ");
-            Serial.print(gps_desc.data.altEllipsoid, 4);
+            Serial.print(gps_desc.getData().altEllipsoid, 4);
             Serial.print("| GPS Lock Type - ");
-            Serial.print(gps_desc.data.gpsLockType);
+            Serial.print(gps_desc.getData().gpsLockType);
             Serial.println();
             has_data = true;
         }
@@ -186,14 +191,7 @@ void sensorLoop() {
         {
             Serial.println("MAX10S: No data (timestamp = 0)");
         }
-
-        if(curr_desc.getLastUpdated() > 0) {
-            Serial.print("INA219 - Curr: ");
-            Serial.println(curr_desc.data.curr, 4);
-            has_data = true;
-        } else {
-            Serial.println("INA219: No data (timestamp = 0)");
-        }
+        */
 
         if (!has_data)
         {
@@ -230,6 +228,12 @@ void setup() {
     pinMode(RED_LED_PIN1, OUTPUT);
     pinMode(RED_LED_PIN2, OUTPUT);
 
+    dev_spi.setMISO(SPI_MISO);
+    dev_spi.setMOSI(SPI_MOSI);
+    dev_spi.setSCLK(SPI_SCLK);
+    dev_spi.begin();
+
+    pinMode(ASM_INT_1, INPUT_PULLDOWN);
     
     // NOTE: Run initialization on the first state
     initStateData(&data);

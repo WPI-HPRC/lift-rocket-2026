@@ -31,6 +31,7 @@ StateID coastLoop (StateData* data, Context* ctx) {
     - Update sensor data and ctx for next iteration?
     */
 
+    /*
     if(data->currentTime > 1000 && !airBrakesOut) {
         ctx->airBrakes.writeMicroseconds(SERVO_MAX);
         airBrakesOut = true;
@@ -39,11 +40,12 @@ StateID coastLoop (StateData* data, Context* ctx) {
         ctx->airBrakes.writeMicroseconds(SERVO_MIN);
         airBrakesDone = true;
     }
+    */
 
-    const auto &baro_desc = ctx->baro.get_descriptor();
-    if (baro_desc.getLastUpdated() != data->lastBaroReadingTime) {
-        data->lastBaroReadingTime = baro_desc.getLastUpdated();
-        double currentAltitiude = solveAltitude(baro_desc.data.pressure);
+    auto &baro_desc = ctx->baro;
+    if (baro_desc.dataUpdatedAt() != data->lastBaroReadingTime) {
+        data->lastBaroReadingTime = baro_desc.dataUpdatedAt();
+        double currentAltitiude = solveAltitude(baro_desc.getData()->pressure);
         if(data->baroDebouncer.update((currentAltitiude - prevAltitude) < 0 ,millis()) && airBrakesDone) {
             return DROGUE_DESCENT;
         }

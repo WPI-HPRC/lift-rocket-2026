@@ -11,10 +11,10 @@ StateID boostLoop (StateData* data, Context* ctx) {
     - Check if need to abort
     - Update sensor data and ctx for next iteration?
     */
-    const auto &accel_desc = ctx->accel.get_descriptor();
-    if (accel_desc.getLastUpdated() != data->lastAccelReadingTime && data->currentTime > 2000) {
-        data->lastAccelReadingTime = accel_desc.getLastUpdated();
-        if(data->accelDebouncer.update(accel_desc.data.accel0 < COAST_THRESHOLD , millis())) {
+    auto &accel_desc = ctx->accel;
+    if (accel_desc.dataUpdatedAt() != data->lastAccelReadingTime && data->currentTime > 2000) {
+        data->lastAccelReadingTime = accel_desc.dataUpdatedAt();
+        if(data->accelDebouncer.update(accel_desc.getData()->accelX < COAST_THRESHOLD , millis())) {
             return COAST;
         }
     }

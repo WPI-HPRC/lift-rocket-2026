@@ -5,7 +5,6 @@
 //#include "Sensors/LSP22.h"
 //#include "Sensors/ICM20948.h"
 //#include "Sensors/MAX10S.h"
-//#include "Sensors/INA219.h"
 #include "Context.h"
 
 enum SensorType {
@@ -13,7 +12,6 @@ enum SensorType {
     LPS22_TAG = 1,
     ICM20948_TAG = 2,
     MAX10S_TAG = 3,
-    INA219_TAG = 4
 };
 
 union LogSensorData {
@@ -21,7 +19,6 @@ union LogSensorData {
     LPS22Data lps22;
     ICMData icm20948;
     MAX10SData max10s;
-    INA219Data ina219;
 };
 
 

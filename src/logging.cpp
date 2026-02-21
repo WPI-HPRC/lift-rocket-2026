@@ -9,7 +9,6 @@ size_t dataLengths[] = {
     sizeof(LPS22Data), // Length of s2 data in Bytes
     sizeof(ICMData),
     sizeof(MAX10SData),
-    sizeof(INA219Data)
 };
 
 bool initializeLogging(Context *ctx) {
@@ -57,12 +56,14 @@ void loggingLoop(Context *ctx) {
         ctx->logFile.flush();
     }
 
+    /* TODO: Someone pls fix
+
     static long lastAccelDataAt = 0;
-    const auto &accel_desc = ctx->accel.get_descriptor();
-    if (accel_desc.getLastUpdated() > lastAccelDataAt) {
-        lastAccelDataAt = accel_desc.getLastUpdated();
+    auto &accel_desc = ctx->accel;
+    if (accel_desc.dataUpdatedAt() > lastAccelDataAt) {
+        lastAccelDataAt = accel_desc.dataUpdatedAt();
         LogSensorData d = {
-            .asm330 = accel_desc.data
+            .asm330 = accel_desc.getData();
         };
         writePacket(ctx, lastAccelDataAt, d, ASM330_TAG);
     }
@@ -96,16 +97,7 @@ void loggingLoop(Context *ctx) {
         };
         writePacket(ctx, lastGpsDataAt, d, MAX10S_TAG);
     }
-
-    static long lastCurrentDataAt = 0;
-    const auto &curr_desc = ctx->curr.get_descriptor();
-    if (curr_desc.getLastUpdated() > lastCurrentDataAt) {
-        lastCurrentDataAt = curr_desc.getLastUpdated();
-        LogSensorData d = {
-            .ina219 = curr_desc.data
-        };
-        writePacket(ctx, lastCurrentDataAt, d, INA219_TAG);
-    }
+        */
 }
 
 void writePacket(Context *ctx, uint32_t timestamp, LogSensorData data, SensorType type) {
