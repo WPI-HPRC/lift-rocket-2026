@@ -1,4 +1,5 @@
 #include "../State.h"
+#include "StateMachineConstants.h"
 
 void drogueDescentInit(StateData *data) {}
 
@@ -6,10 +7,10 @@ StateID drogueDescentLoop (StateData* data, Context* ctx) {
 
     // under main descent if velocity down is between 16 to 30 fps
     // this is abt 5m/s to 9m/s
-    const auto vel_vec = ctx->estimator.get_vec_prev_ned();
+    const auto vel_vec = ctx->estimator.get_vel_prev_ned();
     // velocity in the vertical direction is negative
     // going down will be a positive value
-    if(vel_vec(2, 0) >= 5 && vel_vec(2, 0) <= 9) {
+    if(vel_vec(2, 0) >= MAIN_MIN_VEL && vel_vec(2, 0) <= MAIN_MAX_VEL) {
         return MAIN_DESCENT;
     }
 

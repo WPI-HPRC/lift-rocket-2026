@@ -50,9 +50,9 @@ StateID prelaunchLoop(StateData *data, Context *ctx) {
 //        }
 //    }
 
-    const auto acc_vec = ctx->estimator.get_acc_prev_ned();
+    const auto acc_vec = ctx->estimator.get_accel_prev();
     // check acceleration in vertical direction is greater than threshold
-    if(acc_vec(2, 0) > LAUNCH_TRHESHOLD) {
+    if(acc_vec(0, 0) > LAUNCH_TRHESHOLD) {
         return BOOST;
     }
 
