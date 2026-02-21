@@ -10,7 +10,7 @@ StateID drogueDescentLoop (StateData* data, Context* ctx) {
     const auto vel_vec = ctx->estimator.get_vel_prev_ned();
     // velocity in the vertical direction is negative
     // going down will be a positive value
-    if(vel_vec(2, 0) >= MAIN_MIN_VEL && vel_vec(2, 0) <= MAIN_MAX_VEL) {
+    if(data->accelDebouncer.update(abs(vel_vec(2, 0)) > MAIN_MIN_VEL, millis()) && abs(vel_vec(2, 0)) < MAIN_MAX_VEL, millis()) {
         return MAIN_DESCENT;
     }
 

@@ -15,8 +15,8 @@ StateID boostLoop (StateData* data, Context* ctx) {
     //const auto &accel_desc = ctx->accel.get_descriptor();
     //StateEstimator state_estimator = ctx->estimator;
     const auto acc_vec = ctx->estimator.get_accel_prev();
-    if (acc_vec(0, 0) < COAST_THRESHOLD && data->currentTime > 2000) {
-        // check that acceleration up is less than threshold, and
+    if (data->accelDebouncer.update(abs(acc_vec(0, 0)) < COAST_THRESHOLD, millis()) ||  data->currentTime > 2000) {
+        // check that acceleration up is less than threshold, or
         // current time > 2000
         return COAST;
     }
