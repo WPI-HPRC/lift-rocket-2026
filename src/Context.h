@@ -8,6 +8,7 @@
 #include "Sensors/MAX10S.h"
 #include "Servo.h"
 #include "SensorManager/SensorBase.h"
+#include "qmekf.h"
 
 struct ASM330Data;
 struct LPS22Data;
@@ -18,8 +19,10 @@ struct INA219Data;
 struct Context {
     File logFile;
     File errorLogFile;
+    File fixedRateLogFile;
     SdFs sd;
     bool sdInitialized;
+    bool ekfLooping;
 
     ASM330 accel;
     LPS22 baro;
@@ -28,4 +31,5 @@ struct Context {
     INA219 curr;
     
     Servo airBrakes;
+    StateEstimator estimator;
 };

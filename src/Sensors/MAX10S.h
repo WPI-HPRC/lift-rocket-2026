@@ -8,6 +8,9 @@
 struct MAX10SData {
     float lat;
     float lon;
+    float ecefX;
+    float ecefY;
+    float ecefZ;
     float altMSL;
     float altEllipsoid;
     int32_t velN;
@@ -45,6 +48,9 @@ public:
         out.gpsLockType = GPS.getFixType();
         out.lat = (float)GPS.getLatitude() / 1e7;
         out.lon = (float)GPS.getLongitude() / 1e7;
+        out.ecefX = (float) GPS.getHighResECEFX() * 0.01f;
+        out.ecefY = (float) GPS.getHighResECEFY() * 0.01f;
+        out.ecefZ = (float) GPS.getHighResECEFZ() * 0.01f;
         out.altMSL = (float) GPS.getAltitudeMSL() / 1000.0;
         out.altEllipsoid = (float) GPS.getAltitude() / 1000.0;
         out.velN = GPS.getNedNorthVel();
