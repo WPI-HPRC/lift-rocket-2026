@@ -10,6 +10,7 @@
 #include "boilerplate/Sensors/SensorManager/SensorBase.h"
 
 #define ASM_POLLING_RATE 26
+#define LPS_POLLING_RATE 50
 
 #define ASM_CS PD_5
 #define LSM_CS PB_4
@@ -23,7 +24,7 @@ struct MAX10SData;
 struct INA219Data;
 
 struct Context {
-    Context(SPIClass *dev_spi): accel(dev_spi, ASM_CS, ASM_POLLING_RATE) {}
+    Context(SPIClass *dev_spi): accel(dev_spi, ASM_CS, ASM_POLLING_RATE), baro(dev_spi, LPS_CS, LPS_POLLING_RATE) {}
 
     File logFile;
     File errorLogFile;

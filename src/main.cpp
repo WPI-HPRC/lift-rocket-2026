@@ -4,7 +4,6 @@
 #include "States.h"
 
 #include "boilerplate/Sensors/SensorManager/SensorManager.h"
-//#include "Sensors/LSP22.h"
 //#include "Sensors/ASM330.h"
 //#include "Sensors/ICM20948.h"
 //#include "Sensors/MAX10S.h"
@@ -27,7 +26,7 @@ uint32_t millisSource() { return millis(); }
 
 using MillisFn = uint32_t (*)();
 
-using MgrT = SensorManager<MillisFn, ASM330>;
+using MgrT = SensorManager<MillisFn, ASM330, LPS22>;
 
 MgrT* mgr = nullptr;   // declare now
 
@@ -92,7 +91,6 @@ void sensorLoop() {
     if (millis() - last_print > 200)
     {
         last_print = millis();
-        loop_count++;
 
         Serial.print("\n=== Loop ");
         Serial.print(loop_count);
@@ -100,7 +98,7 @@ void sensorLoop() {
 
         // DIRECT ACCESS to sensor data - this is guaranteed to work
         const auto &accel_desc = ctx->accel.get_descriptor();
-        // const auto &baro_desc = ctx->baro.get_descriptor();
+        const auto &baro_desc = ctx->baro.get_descriptor();
         // const auto &mag_desc = ctx->mag.get_descriptor();
         // const auto &gps_desc = ctx->gps.get_descriptor();
         // const auto &curr_desc = ctx->curr.get_descriptor();
@@ -129,7 +127,6 @@ void sensorLoop() {
             Serial.println("ASM330: No data (timestamp = 0)");
         }
 
-        /*
         // Print LPS22 data
         if (baro_desc.getLastUpdated() > 0)
         {
@@ -144,6 +141,7 @@ void sensorLoop() {
         {
             Serial.println("LPS22: No data (timestamp = 0)");
         }
+        /*
 
         if(mag_desc.getLastUpdated()  > 0)
         {
@@ -203,6 +201,7 @@ void sensorLoop() {
 
         Serial.println("======================");
     }
+    loop_count++;
 }
 
 void setup() {
@@ -250,7 +249,7 @@ void setup() {
 
     ctx = new Context(&dev_spi);
 
-    static MgrT mgr_storage(millisSource, ctx->accel);
+    static MgrT mgr_storage(millisSource, ctx->accel, ctx->baro);
     mgr = &mgr_storage;
 
     pinMode(LPS_CS, OUTPUT); digitalWrite(LPS_CS, HIGH);
